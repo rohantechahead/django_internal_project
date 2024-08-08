@@ -20,6 +20,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
+
+
+
+import environ
+
+# Initialize environment variables
+env = environ.Env()
+environ.Env.read_env()  # Reads the .env file
 SECRET_KEY = "django-insecure-%5=*i55%=p)mw_sfg@z-e)sg@-wm0y@a-gf$1@78ou-&au4y(="
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -71,15 +79,18 @@ TEMPLATES = [
 WSGI_APPLICATION = "intern_network.wsgi.application"
 
 
-# Database
-# https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-
+#
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'social_meadia_api',
+        'USER': 'root',
+        'PASSWORD': 'root',
+        'PORT': 3306,
+        'CONN_MAX_AGE': 500,
+        'ATOMIC_REQUESTS': True,
+        }
     }
-}
 
 
 # Password validation

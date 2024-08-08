@@ -1,3 +1,17 @@
-from django.shortcuts import render
+from rest_framework import status
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 
-# Create your views here.
+from .models import User
+from .validator import verifying_signup_request
+
+
+@api_view(['POST'])
+def signup_api(request):
+    if not verifying_signup_request(request):
+        return Response({"Error": "Invalid request body"}, status=status.HTTP_400_BAD_REQUEST)
+    # Create the user
+    user = User(username=request.data.get('username'))
+    user.set_password(request.data.get('password'))
+    user.save()
+    return Response({"Success": "User Created Successfully"}, status=status.HTTP_200_OK)
