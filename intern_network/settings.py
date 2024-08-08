@@ -27,7 +27,7 @@ import environ
 
 # Initialize environment variables
 env = environ.Env()
-environ.Env.read_env()  # Reads the .env fil
+environ.Env.read_env()  # Reads the .env file
 SECRET_KEY = "django-insecure-%5=*i55%=p)mw_sfg@z-e)sg@-wm0y@a-gf$1@78ou-&au4y(="
 
 # SECURITY WARNING: don't run with debug turned on in production!
