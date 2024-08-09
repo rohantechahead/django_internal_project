@@ -1,6 +1,5 @@
 from datetime import datetime, timedelta
 from functools import wraps
-from urllib import response
 
 import jwt
 from django.conf import settings
@@ -16,6 +15,15 @@ REFRESH_TOKEN_LIFETIME = timedelta(days=1)
 
 
 def generate_access_token(user):
+    """
+    Generate an access token for a user.
+
+    Args:
+        user (User): The user object for which the token is generated.
+
+    Returns:
+        str: The encoded JWT access token.
+    """
     expiration = datetime.utcnow() + ACCESS_TOKEN_LIFETIME
     payload = {
         'user_id': user.id,
@@ -26,6 +34,15 @@ def generate_access_token(user):
 
 
 def generate_refresh_token(user):
+    """
+    Generate a refresh token for a user.
+
+    Args:
+        user (User): The user object for which the token is generated.
+
+    Returns:
+        str: The encoded JWT refresh token.
+    """
     expiration = datetime.utcnow() + REFRESH_TOKEN_LIFETIME
     payload = {
         'user_id': user.id,
@@ -36,6 +53,16 @@ def generate_refresh_token(user):
 
 
 def decode_token(token):
+    """
+    Decode a JWT token.
+
+    Args:
+        token (str): The JWT token to decode.
+
+    Returns:
+        dict: The decoded payload if the token is valid.
+        JsonResponse: An error response if the token is expired or invalid.
+    """
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=['HS256'])
         return payload
@@ -46,16 +73,35 @@ def decode_token(token):
 
 
 def is_auth(fun):
+    """
+    Decorator to check if the request is authenticated.
+
+    Args:
+        fun (function): The view function to wrap.
+
+    Returns:
+        function: The wrapped function that checks for authentication.
+    """
+
     @wraps(fun)
     def wrap(request, *args, **kwargs):
-        print(request.headers)
-        print(request, *args, **kwargs)
+        """
+        Wrapper function to check for JWT token in the request headers.
+
+        Args:
+            request (HttpRequest): The HTTP request object.
+            *args: Variable length argument list.
+            **kwargs: Arbitrary keyword arguments.
+
+        Returns:
+            HttpResponse: The response from the wrapped function or an error response.
+        """
 
         try:
             token = request.headers.get('Authorization')
 
             if not token:
-                return response({"message": "Token is missing!"}, status=status.HTTP_403_FORBIDDEN)
+                return JsonResponse({"message": "Authorization Token is missing!"}, status=status.HTTP_403_FORBIDDEN)
 
             decode_token_result = jwt.decode(token, SECRET_KEY, algorithms=['HS256'])  # (token)
 
@@ -64,7 +110,7 @@ def is_auth(fun):
             return fun(request, *args, **kwargs)
 
         except jwt.ExpiredSignatureError:
-            return JsonResponse({"message": "Token is expired"}, status=status.HTTP_498_INVALID_TOKEN)
+            return JsonResponse({"message": "Token is expired"}, status=status.HTTP_403_FORBIDDEN)
         except jwt.InvalidTokenError:
             return JsonResponse({"message": "Invalid token"}, status=status.HTTP_403_FORBIDDEN)
 
