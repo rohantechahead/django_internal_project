@@ -1,9 +1,12 @@
+from django.db.models import Q
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+
+from utility.authentication_helper import generate_refresh_token, generate_access_token
 from .models import User
 from .serializer import LoginSerializer
-from .validator import verifying_user_login,verifying_signup_request
+from .validator import verifying_user_login, verifying_signup_request
 
 
 @api_view(['POST'])
@@ -20,27 +23,31 @@ def signup_api(request):
 
 
 @api_view(['POST'])
-def login(request):
-    # Validate the incoming data using Cerberus
+def user_login(request):
     if not verifying_user_login(request):
         return Response({'success': False, 'message': 'Invalid data'}, status=400)
-
-    # If validation passes, check if user exists
-    username = request.data.get('username')
-    email = request.data.get('email')
+    username_or_email = request.data.get('username')
     password = request.data.get('password')
 
+    if not username_or_email or not password:
+        return Response({'error': 'Username and password are required'}, status=status.HTTP_400_BAD_REQUEST)
+
     try:
-        if username:
-            user = User.objects.get(username=username, password=password)
-        else:
-            user = User.objects.get(email=email, password=password)
-
-        # Here, you can generate tokens or start a session
-        return Response({'success': True, 'message': 'Login successful'})
-
+        user = User.objects.get(Q(username=username_or_email) | Q(email=username_or_email))
     except User.DoesNotExist:
-        return Response({'success': False, 'message': 'Invalid credentials'}, status=400)
+        return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
+    if not user.check_password(password):
+        return Response({'error': 'Incorrect password'}, status=status.HTTP_401_UNAUTHORIZED)
 
+    access_token = generate_access_token(user)
+    refresh_token = generate_refresh_token(user)
+
+    user_data = LoginSerializer(user).data
+    user_data.update({
+        "access_token": access_token,
+        "refresh_token": refresh_token
+    })
+
+    return Response(user_data, status=status.HTTP_200_OK)
 
