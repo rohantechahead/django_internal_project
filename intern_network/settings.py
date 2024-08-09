@@ -21,21 +21,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 
-
-
-# import environ
-#
-# # Initialize environment variables
-# env = environ.Env()
-# environ.Env.read_env()  # Reads the .env file
-# print("env...",env)
-
 import environ
 BASE_DIR = Path(__file__).resolve().parent.parent
 env = environ.Env()
 environ.Env.read_env(env_file=str(BASE_DIR) + "/.env")
 BASE_DIR = Path(__file__).resolve().parent.parent
-# Initialize environment variables
+
 
 
 SECRET_KEY = "django-insecure-%5=*i55%=p)mw_sfg@z-e)sg@-wm0y@a-gf$1@78ou-&au4y(="
@@ -87,21 +78,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "intern_network.wsgi.application"
-
-
-#
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.mysql",
-#         "NAME": "social_media",
-#         "USER": "monika",
-#         "PASSWORD": "monika@2305",
-#         "PORT": 3306,
-#         "CONN_MAX_AGE": 500,
-#         "ATOMIC_REQUESTS": True,
-#     }
-#
-#     }
 
 DATABASES = {
     'default': {

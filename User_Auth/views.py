@@ -2,12 +2,10 @@ from django.db.models import Q
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-
 from utility.authentication_helper import generate_refresh_token, generate_access_token
 from .models import User
 from .serializer import LoginSerializer
 from .validator import verifying_user_login, verifying_signup_request
-
 
 @api_view(['POST'])
 def signup_api(request):
@@ -20,7 +18,6 @@ def signup_api(request):
     user.save()
 
     return Response({"Success": "User Created Successfully"}, status=status.HTTP_200_OK)
-
 
 @api_view(['POST'])
 def user_login(request):
@@ -48,6 +45,5 @@ def user_login(request):
         "access_token": access_token,
         "refresh_token": refresh_token
     })
-
     return Response(user_data, status=status.HTTP_200_OK)
 

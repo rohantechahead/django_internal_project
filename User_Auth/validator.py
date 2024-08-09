@@ -25,11 +25,8 @@ def verifying_user_login(request):
         schema.update({'username': {'type': 'string',  'required': True}})
     else:
         schema.update({'email': {'type': 'string',  'required': True, 'regex': r'^\S+@\S+\.\S+$'}})
-
-    print("scuehma--->", schema)
-    print("success-->", request.data)
     v = Validator(schema)
-    print("--------------->", v.validate(request.data))
+
     if v.validate(request.data):
         return True
     else:
