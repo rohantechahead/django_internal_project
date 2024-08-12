@@ -11,6 +11,7 @@ from .serializer import LoginSerializer
 from .validator import verifying_user_login, verifying_signup_request, verifying_forgotpassword_request
 
 
+
 @api_view(['POST'])
 def signup_api(request):
     if not verifying_signup_request(request):
@@ -18,6 +19,7 @@ def signup_api(request):
     security_q = request.data.get('security_q')
     security_a = request.data.get('security_a')
 
+<<<<<<< HEAD
     if not security_q or not security_a:
         return Response({"Error": "Security question and answer are required"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -31,6 +33,22 @@ def signup_api(request):
     user_security_q = UsersecurityQuestion(user_id=user, security_q=security_q, security_a=security_a)
     user_security_q.save()
 
+=======
+    # Get the username from the request
+    username = request.data.get('username')
+    email = request.data.get('email')
+
+
+
+    # Create the user
+    user = User(username=username, email=email)
+    user.set_password(request.data.get('password'))
+    # Set the email as username + '@yopmal.com'
+    if not email:
+        user.email = f"{username}@yopmal.com"
+
+    user.save()
+>>>>>>> ebd5a48612a96cfee1b11836c2ba6a719071574a
     return Response({"Success": "User Created Successfully"}, status=status.HTTP_200_OK)
 
 
@@ -61,6 +79,7 @@ def user_login(request):
         "refresh_token": refresh_token
     })
     return Response(user_data, status=status.HTTP_200_OK)
+<<<<<<< HEAD
 
 @api_view(['POST'])
 def forgot_password_api(request):
@@ -151,3 +170,5 @@ def get_security_q_a(request, user_id):
 
 
 
+=======
+>>>>>>> ebd5a48612a96cfee1b11836c2ba6a719071574a

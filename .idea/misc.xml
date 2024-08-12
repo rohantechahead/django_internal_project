@@ -3,7 +3,11 @@
   <component name="Black">
     <option name="sdkName" value="Python 3.11 (social_media_api)" />
   </component>
+<<<<<<< HEAD
   <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.12 (django_internal_project) (2)" project-jdk-type="Python SDK" />
+=======
+  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.10 (Social_Media_Api)" project-jdk-type="Python SDK" />
+>>>>>>> ebd5a48612a96cfee1b11836c2ba6a719071574a
   <component name="PyCharmProfessionalAdvertiser">
     <option name="shown" value="true" />
   </component>
