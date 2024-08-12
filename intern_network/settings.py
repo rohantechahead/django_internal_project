@@ -82,10 +82,10 @@ WSGI_APPLICATION = "intern_network.wsgi.application"
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': env('DB_NAME'),
-        'USER': env('DB_USER'),
-        'PASSWORD': env('DB_PASSWORD'),
-        'PORT': env('DB_PORT'),
+        'NAME': 'social_user',
+        'USER': 'root',
+        'PASSWORD': 'Amjad1912@',
+        'PORT': '3306',
         'CONN_MAX_AGE': 500,
         "ATOMIC_REQUESTS": True,
     }

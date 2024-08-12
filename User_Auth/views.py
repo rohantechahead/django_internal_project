@@ -2,10 +2,11 @@ from django.db.models import Q
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from utility.authentication_helper import generate_refresh_token, generate_access_token
+from utility.authentication_helper import generate_refresh_token, generate_access_token, is_auth
 from .models import User
 from .serializer import LoginSerializer
 from .validator import verifying_user_login, verifying_signup_request
+from rest_framework.permissions import IsAuthenticated
 
 
 @api_view(['POST'])
@@ -57,3 +58,29 @@ def user_login(request):
         "refresh_token": refresh_token
     })
     return Response(user_data, status=status.HTTP_200_OK)
+
+
+
+@api_view(['POST'])
+@is_auth
+def user_logout(request):
+    try:
+        # Retrieve the authenticated user's ID from the request object
+        user_id = request.user_id
+
+        # Fetch the user instance from the database using the user_id
+        user = User.objects.get(id=user_id)
+
+        # Clear the user's tokens to effectively log them out
+        user.token = None
+
+        # Save the updated user instance to the database
+        user.save()
+
+        return Response({'success': True, 'message': 'Logged out successfully'}, status=status.HTTP_200_OK)
+
+    except User.DoesNotExist:
+        return Response({'success': False, 'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    except Exception as e:
+        return Response({'success': False, 'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
