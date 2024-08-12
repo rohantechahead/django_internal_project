@@ -8,17 +8,28 @@ from .serializer import LoginSerializer
 from .validator import verifying_user_login, verifying_signup_request
 from rest_framework.permissions import IsAuthenticated
 
+
 @api_view(['POST'])
 def signup_api(request):
     if not verifying_signup_request(request):
         return Response({"Error": "Invalid request body"}, status=status.HTTP_400_BAD_REQUEST)
 
-    # Create the user
-    user = User(username=request.data.get('username'))
-    user.set_password(request.data.get('password'))
-    user.save()
+    # Get the username from the request
+    username = request.data.get('username')
+    email = request.data.get('email')
 
+
+
+    # Create the user
+    user = User(username=username, email=email)
+    user.set_password(request.data.get('password'))
+    # Set the email as username + '@yopmal.com'
+    if not email:
+        user.email = f"{username}@yopmal.com"
+
+    user.save()
     return Response({"Success": "User Created Successfully"}, status=status.HTTP_200_OK)
+
 
 @api_view(['POST'])
 def user_login(request):
@@ -49,6 +60,7 @@ def user_login(request):
     return Response(user_data, status=status.HTTP_200_OK)
 
 
+
 @api_view(['POST'])
 @is_auth
 def user_logout(request):
@@ -72,4 +84,3 @@ def user_logout(request):
 
     except Exception as e:
         return Response({'success': False, 'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
