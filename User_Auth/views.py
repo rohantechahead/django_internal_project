@@ -18,7 +18,14 @@ def signup_api(request):
     username = request.data.get('username')
     email = request.data.get('email')
 
+    # Create the user
+    user = User(username=request.data.get('username'))
+    user.set_password(request.data.get('password'))
+    user.save()
 
+    # Get the username from the request
+    username = request.data.get('username')
+    email = request.data.get('email')
 
     # Create the user
     user = User(username=username, email=email)
@@ -57,8 +64,40 @@ def user_login(request):
         "access_token": access_token,
         "refresh_token": refresh_token
     })
+    user.refresh_token=str(refresh_token)
+    user.is_login=True
+    user.save()
     return Response(user_data, status=status.HTTP_200_OK)
 
+
+@api_view(['PUT'])
+@is_auth
+def update_profile(request):
+    user_id = request.user_id
+    try:
+        user = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        return Response({"Error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+    # username = request.data.get('username')
+    username=user.username
+
+    email = request.data.get('email')
+
+    if email:
+        user.email = email
+    else:
+        user.email = f"{username}@yopmal.com"
+
+    user.first_name = request.data.get('first_name')
+    user.last_name = request.data.get('last_name')
+
+    user.gender = request.data.get('gender')
+
+    user.dob = request.data.get('dob')
+    user.phone_no = request.data.get('phone_no')
+    user.save()
+
+    return Response({"Success": "Profile Updated Successfully"}, status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])
@@ -72,11 +111,10 @@ def user_logout(request):
         user = User.objects.get(id=user_id)
 
         # Clear the user's tokens to effectively log them out
-        user.token = None
-
+        user.refresh_token = ""
+        user.is_login=False
         # Save the updated user instance to the database
         user.save()
-
         return Response({'success': True, 'message': 'Logged out successfully'}, status=status.HTTP_200_OK)
 
     except User.DoesNotExist:
