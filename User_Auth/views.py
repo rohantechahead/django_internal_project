@@ -8,7 +8,6 @@ from .serializer import LoginSerializer
 from .validator import verifying_user_login, verifying_signup_request
 
 
-
 @api_view(['POST'])
 def signup_api(request):
     if not verifying_signup_request(request):
@@ -16,19 +15,19 @@ def signup_api(request):
 
     # Get the username from the request
     username = request.data.get('username')
+    email = request.data.get('email')
+
+
 
     # Create the user
-    user = User(username=username)
+    user = User(username=username, email=email)
     user.set_password(request.data.get('password'))
-
-    # Set the email as username + '@gmail.com'
-    user.email = f"{username}@yopmal.com"
+    # Set the email as username + '@yopmal.com'
+    if not email:
+        user.email = f"{username}@yopmal.com"
 
     user.save()
     return Response({"Success": "User Created Successfully"}, status=status.HTTP_200_OK)
-
-
-
 
 
 @api_view(['POST'])
@@ -58,4 +57,3 @@ def user_login(request):
         "refresh_token": refresh_token
     })
     return Response(user_data, status=status.HTTP_200_OK)
-
