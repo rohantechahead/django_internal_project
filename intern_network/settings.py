@@ -82,10 +82,16 @@ WSGI_APPLICATION = "intern_network.wsgi.application"
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': env('DB_NAME'),
-        'USER': env('DB_USER'),
-        'PASSWORD': env('DB_PASSWORD'),
-        'PORT': env('DB_PORT'),
+
+        # 'NAME': env(''),
+        # 'USER': env('DB_USER'),
+        # 'PASSWORD': env('DB_PASSWORD'),
+        # 'PORT': env('DB_PORT'),
+
+        'NAME': 'social_media_api',
+        'USER': 'root',
+        'PASSWORD': 'Afzal0510',
+        'PORT': 3306,
         'CONN_MAX_AGE': 500,
         "ATOMIC_REQUESTS": True,
     }
@@ -133,3 +139,12 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+
+SECURITY_QUESTIONS = [
+    "What was the name of your first pet?",
+    "What is your mother's maiden name?",
+    "What was your first car?",
+    "What elementary school did you attend?",
+    "What is your favorite food?"
+]
