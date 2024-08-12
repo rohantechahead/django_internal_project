@@ -2,7 +2,7 @@ from django.db.models import Q
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from utility.authentication_helper import generate_refresh_token, generate_access_token
+from utility.authentication_helper import generate_refresh_token, generate_access_token, is_auth
 from .models import User
 from .serializer import LoginSerializer
 from .validator import verifying_user_login, verifying_signup_request
@@ -12,6 +12,13 @@ def signup_api(request):
     if not verifying_signup_request(request):
         return Response({"Error": "Invalid request body"}, status=status.HTTP_400_BAD_REQUEST)
 
+<<<<<<< Updated upstream
+=======
+    # Get the username from the request
+    username = request.data.get('username')
+    email = request.data.get('email')
+
+>>>>>>> Stashed changes
     # Create the user
     user = User(username=request.data.get('username'))
     user.set_password(request.data.get('password'))
@@ -47,3 +54,35 @@ def user_login(request):
     })
     return Response(user_data, status=status.HTTP_200_OK)
 
+<<<<<<< Updated upstream
+=======
+
+@api_view(['PUT'])
+@is_auth
+def update_profile(request):
+    user_id = request.user_id
+    try:
+        user = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        return Response({"Error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+    username = request.data.get('username')
+    if username:
+        user.username = username
+    email = request.data.get('email')
+
+    if email:
+        user.email = email
+    else:
+        user.email = f"{username}@yopmal.com"
+        
+    user.first_name = request.data.get('first_name')
+    user.last_name = request.data.get('last_name')
+
+    user.gender = request.data.get('gender')
+
+    user.DOB = request.data.get('DOB')
+    user.phone_no = request.data.get('phone_no')
+    user.save()
+
+    return Response({"Success": "Profile Updated Successfully"}, status=status.HTTP_200_OK)
+>>>>>>> Stashed changes
