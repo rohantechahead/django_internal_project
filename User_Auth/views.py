@@ -78,9 +78,9 @@ def update_profile(request):
         user = User.objects.get(id=user_id)
     except User.DoesNotExist:
         return Response({"Error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
-    username = request.data.get('username')
-    if username:
-        user.username = username
+    # username = request.data.get('username')
+    username=user.username
+
     email = request.data.get('email')
 
     if email:
@@ -93,7 +93,7 @@ def update_profile(request):
 
     user.gender = request.data.get('gender')
 
-    user.DOB = request.data.get('DOB')
+    user.dob = request.data.get('dob')
     user.phone_no = request.data.get('phone_no')
     user.save()
 

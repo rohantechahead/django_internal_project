@@ -8,7 +8,7 @@ class User(models.Model):
     first_name = models.CharField(max_length=50, default=None,blank=True)
     last_name = models.CharField(max_length=50, default=None,blank=True)
     gender = models.CharField(max_length=10, default=None,blank=True)
-    DOB = models.CharField(max_length=20, default=None, null=True, blank=True)
+    dob = models.CharField(max_length=20, default=None, null=True, blank=True)
     password = models.CharField(max_length=500)
     phone_no = models.IntegerField(default=0,null=True)
     refresh_token = models.CharField(max_length=200, default='None')

@@ -1,8 +1,6 @@
 from django.urls import path
 from .views import user_login, signup_api, update_profile, user_logout
 
-# from . views import user_login,signup_api, user_logout
-
 
 urlpatterns = [
     path('signup/', signup_api, name='signup'),
