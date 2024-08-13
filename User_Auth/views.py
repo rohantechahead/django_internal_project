@@ -83,7 +83,7 @@ def user_logout(request):
         return Response({'success': False, 'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 @api_view(['GET'])
 @is_auth
-def profile_get(request):
+def get_profile(request):
     user_id = request.user_id
     try:
         user = User.objects.get(id=user_id)
