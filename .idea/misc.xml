@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="Black">
-    <option name="sdkName" value="Python 3.11 (social_media_api)" />
+  <component name="ProjectRootManager" version="2" languageLevel="PYTHON36">
+    <output url="file://$PROJECT_DIR$/out" />
+    <orderEntry type="library" name="Python SDK" level="project" />
   </component>
+<<<<<<< HEAD
 <<<<<<< HEAD
   <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.12 (django_internal_project) (2)" project-jdk-type="Python SDK" />
 =======
@@ -12,3 +14,6 @@
     <option name="shown" value="true" />
   </component>
 </project>
+=======
+</project>
+>>>>>>> 9844adaa2dccee29780a5c22ac9da70aed42a4e1

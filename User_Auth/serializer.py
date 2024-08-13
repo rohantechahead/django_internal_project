@@ -1,9 +1,9 @@
 from rest_framework import serializers
-<<<<<<< HEAD
+
 from .models import User, UsersecurityQuestion
-=======
+
 from .models import User
->>>>>>> ebd5a48612a96cfee1b11836c2ba6a719071574a
+
 
 
 class LoginSerializer(serializers.ModelSerializer):
