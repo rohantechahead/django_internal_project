@@ -128,9 +128,6 @@ def get_refresh_token(request):
     if not verifying_refresh_token(request):
         return Response({"Error": "Invalid Request Body"}, status=status.HTTP_400_BAD_REQUEST)
     refresh_token = request.data.get('refresh_token')
-    # refresh_token=request.data.get('refresh_token')
-    # if not refresh_token:
-    #     return Response({"Error": "Refresh token not provided"}, status=status.HTTP_400_BAD_REQUEST)
     user = User.objects.get(refresh_token=refresh_token)
     new_refresh_token = generate_refresh_token(user)
     access_token = generate_access_token(user)
