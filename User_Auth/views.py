@@ -4,7 +4,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from utility.authentication_helper import generate_refresh_token, generate_access_token, is_auth
 from .models import User
-from .serializer import LoginSerializer,UserSerializer
+from .serializer import LoginSerializer,UserProfileSerializer,UserSerializer
 from .validator import verifying_user_login, verifying_signup_request
 from rest_framework.permissions import IsAuthenticated
 @api_view(['POST'])
@@ -17,7 +17,6 @@ def signup_api(request):
     user.set_password(request.data.get('password'))
     if not email:
         user.email = f"{username}@yopmal.com"
-        print("print.....",user.email)
     user.save()
     return Response({"Success": "User Created Successfully"}, status=status.HTTP_200_OK)
 @api_view(['POST'])
@@ -92,12 +91,5 @@ def profile_get(request):
         user = User.objects.get(id=user_id)
     except User.DoesNotExist:
         return Response({"Error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
-    return Response({
-        "username": user.username,
-        "email": user.email,
-        "first_name": user.first_name,
-        "last_name": user.last_name,
-        "gender": user.gender,
-        "dob": user.dob,
-        "phone_no": user.phone_no,
-    }, status=status.HTTP_200_OK)
+    serializer = UserProfileSerializer(user)
+    return Response(serializer.data, status=status.HTTP_200_OK)
