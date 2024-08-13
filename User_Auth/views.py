@@ -68,7 +68,6 @@ def user_login(request):
         user = User.objects.get(Q(username=username_or_email) | Q(email=username_or_email))
     except User.DoesNotExist:
         return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
-    user.save()
     if not user.check_password(password):
         return Response({'error': 'Incorrect password'}, status=status.HTTP_401_UNAUTHORIZED)
 
