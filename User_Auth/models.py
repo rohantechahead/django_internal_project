@@ -5,8 +5,13 @@ class User(models.Model):
     email = models.EmailField(unique=True)
     first_name = models.CharField(max_length=50, default=None,blank=True,null=True)
     last_name = models.CharField(max_length=50, default=None,blank=True,null=True)
+<<<<<<< Updated upstream
     gender = models.CharField(max_length=10, default=None,blank=True,null=True)
     dob = models.DateField(blank=True, null=True)
+=======
+    gender = models.CharField(max_length=10, default=None,blank=True)
+    dob = models.CharField(max_length=20, default=None, null=True, blank=True)
+>>>>>>> Stashed changes
     password = models.CharField(max_length=500)
     phone_no = models.IntegerField(blank=True,default=0,null=True)
     refresh_token = models.CharField(max_length=200, default='None')
