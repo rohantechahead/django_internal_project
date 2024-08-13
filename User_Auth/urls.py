@@ -13,7 +13,7 @@ urlpatterns = [
     path('delete/',user_delete, name='delete'),
 
     path('get_profile/',update_profile,name='get-profile'),
-    path('refresh_token/',get_refresh_token,name='refresh-token')
+    path('refresh-token/',get_refresh_token,name='refresh-token')
 
 
 ]
