@@ -25,7 +25,6 @@ def user_login(request):
         return Response({'success': False, 'message': 'Invalid data'}, status=400)
     username_or_email = request.data.get('username')
     password = request.data.get('password')
-
     if not username_or_email or not password:
         return Response({'error': 'Username and password are required'}, status=status.HTTP_400_BAD_REQUEST)
     try:
@@ -35,7 +34,6 @@ def user_login(request):
 
     if not user.check_password(password):
         return Response({'error': 'Incorrect password'}, status=status.HTTP_401_UNAUTHORIZED)
-
     access_token = generate_access_token(user)
     refresh_token = generate_refresh_token(user)
 
@@ -93,3 +91,16 @@ def profile_get(request):
         return Response({"Error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
     serializer = UserProfileSerializer(user)
     return Response(serializer.data, status=status.HTTP_200_OK)
+@api_view(['DELETE'])
+@is_auth
+def user_delete(request):
+    try:
+        user_id = request.user_id
+        user = User.objects.get(id=user_id)
+        user.delete()
+        return Response({'success': True, 'message': 'User deleted successfully'}, status=status.HTTP_200_OK)
+    except User.DoesNotExist:
+         return Response({'success': False, 'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response({'success': False, 'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+

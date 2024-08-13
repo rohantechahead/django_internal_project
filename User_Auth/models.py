@@ -13,8 +13,6 @@ class User(models.Model):
     is_login = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-
-
     def check_password(self, raw_password):
         return check_password(raw_password, self.password)
 
