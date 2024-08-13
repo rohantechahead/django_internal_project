@@ -1,30 +1,23 @@
 from django.db.models import Q
 from rest_framework import status
 from rest_framework.decorators import api_view
-from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.response import Response
+
 from utility.authentication_helper import generate_refresh_token, generate_access_token, is_auth
 from .models import User
-from .serializer import LoginSerializer,UserProfileSerializer,UserSerializer
+from .serializer import LoginSerializer, UserProfileSerializer
 from .validator import verifying_user_login, verifying_signup_request
-<<<<<<< Updated upstream
-from rest_framework.permissions import IsAuthenticated
-=======
 
 
-
->>>>>>> Stashed changes
 @api_view(['POST'])
 def signup_api(request):
     if not verifying_signup_request(request):
         return Response({"Error": "Invalid request body"}, status=status.HTTP_400_BAD_REQUEST)
     username = request.data.get('username')
     email = request.data.get('email')
-<<<<<<< Updated upstream
-=======
 
     # Create the user
->>>>>>> Stashed changes
+
     user = User(username=username, email=email)
     user.set_password(request.data.get('password'))
     if not email:
@@ -71,12 +64,11 @@ def update_profile(request):
     if email:
         user.email = email
     else:
-<<<<<<< Updated upstream
-        user.email = f"{username}@yopmal.com"
-=======
-         user.email = f"{username}@yopmal.com"
 
->>>>>>> Stashed changes
+        user.email = f"{username}@yopmal.com"
+        user.email = f"{username}@yopmal.com"
+
+
     user.first_name = request.data.get('first_name')
     user.last_name = request.data.get('last_name')
     user.gender = request.data.get('gender')
@@ -98,7 +90,6 @@ def user_logout(request):
         return Response({'success': False, 'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
         return Response({'success': False, 'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-<<<<<<< Updated upstream
 @api_view(['GET'])
 @is_auth
 def get_profile(request):
@@ -121,7 +112,6 @@ def user_delete(request):
          return Response({'success': False, 'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
         return Response({'success': False, 'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-=======
 
 @api_view()
 def get_refresh_token(request):
@@ -139,15 +129,4 @@ def get_refresh_token(request):
 
 
 
-
-
-
-
-
-
-
-
-
-
->>>>>>> Stashed changes
 
