@@ -26,7 +26,7 @@ class User(models.Model):
 class UsersecurityQuestion(models.Model):
     id = models.AutoField(primary_key=True, serialize=False)
     user_id = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
-    security_q = models.CharField(max_length=200)
+    security_q = models.CharField(max_length=200,null=True)
     security_a = models.CharField(max_length=200)
 
 

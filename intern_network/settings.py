@@ -135,10 +135,3 @@ STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
-SECURITY_QUESTIONS = [
-    "What was the name of your first pet?",
-    "What is your mother's maiden name?",
-    "What was your first car?",
-    "What elementary school did you attend?",
-    "What is your favorite food?"
-]

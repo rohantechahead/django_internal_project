@@ -15,10 +15,6 @@ def verifying_signup_request(request):
          })
     else:
         schema.update({'email': {'type': 'string','required': True, 'regex': r'^\S+@\S+\.\S+$'}})
-    # if "username" in request.data:
-    #     schema.update({'username': {'type': 'string','required': True}})
-    # else:
-    #     schema.update({'email': {'type': 'string','required': True, 'regex': r'^\S+@\S+\.\S+$'}})
 
 
     v = Validator(schema)
@@ -59,6 +55,7 @@ def verifying_forgotpassword_request(request):
         schema.update({
             'email': {'type': 'string', 'maxlength': 254, 'required': True},
             'security_q': {'type': 'string', 'required': True},
+            'security_a': {'type': 'string', 'required': True},
         })
 
     v = Validator(schema)

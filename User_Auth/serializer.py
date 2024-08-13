@@ -5,7 +5,6 @@ from .models import User, UsersecurityQuestion
 from .models import User
 
 
-
 class LoginSerializer(serializers.ModelSerializer):
     class Meta:
         model = User

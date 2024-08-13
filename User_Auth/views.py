@@ -46,9 +46,6 @@ def signup_api(request):
     email = request.data.get('email')
 
     # Create the user
-    # user = User(username=username, email=email)
-    # user.set_password(request.data.get('password'))
-    # Set the email as username + '@yopmal.com'
     if not email:
         user.email = f"{username}@yopmal.com"
 
@@ -71,7 +68,7 @@ def user_login(request):
         user = User.objects.get(Q(username=username_or_email) | Q(email=username_or_email))
     except User.DoesNotExist:
         return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
-
+    user.save()
     if not user.check_password(password):
         return Response({'error': 'Incorrect password'}, status=status.HTTP_401_UNAUTHORIZED)
 
@@ -85,6 +82,7 @@ def user_login(request):
     })
     user.refresh_token=str(refresh_token)
     user.is_login=True
+
     user.save()
     return Response(user_data, status=status.HTTP_200_OK)
 
@@ -93,6 +91,7 @@ def forgot_password_api(request):
     if not verifying_forgotpassword_request(request):
         return Response({'success': False, 'message': 'Invalid data'}, status=400)
     username_or_email = request.data.get('username')
+    security_q=request.data.get('security_q')
     security_a = request.data.get('security_a')
     new_password = request.data.get('new_password')
 
@@ -102,14 +101,13 @@ def forgot_password_api(request):
         return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
 
     try:
-        user_security_q = UsersecurityQuestion.objects.get(user_id=user.id)
+        user_security_q = UsersecurityQuestion.objects.get(user_id=user)
     except UsersecurityQuestion.DoesNotExist:
         return Response({'error': 'Security question not found'}, status=status.HTTP_404_NOT_FOUND)
 
-    if user_security_q.security_a != security_a:
+    if user_security_q.security_q != security_q or user_security_q.security_a != security_a:
         return Response({'error': 'Security question or answer is incorrect'}, status=status.HTTP_401_UNAUTHORIZED)
 
-    # new_password = 'newpassword'
     user.set_password(new_password)
     user.save()
 
@@ -142,29 +140,6 @@ def update_security_q_a(request):
         return Response({'error': 'Security question not found'}, status=status.HTTP_404_NOT_FOUND)
 
 
-
-@api_view(['DELETE'])
-@is_auth
-def delete_security_q_a(request):
-    user_id = request.user_id
-    try:
-        user = User.objects.get(id=user_id)
-    except User.DoesNotExist:
-        return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
-
-    try:
-        user_security_q = UsersecurityQuestion.objects.get(user_id=user)
-        user_security_q.security_q= ''
-        user_security_q.security_a = ''
-        user_security_q.save()
-
-        return Response({'success': True, 'message': 'Security question and answer deleted successfully'}, status=status.HTTP_200_OK)
-    except UsersecurityQuestion.DoesNotExist:
-        return Response({'error': 'Security question not found'}, status=status.HTTP_404_NOT_FOUND)
-
-
-
-
 @api_view(['GET'])
 @is_auth
 def get_security_q_a(request):
@@ -181,11 +156,9 @@ def get_security_q_a(request):
 
     data = {
         'security_q': user_security_q.security_q,
+        'security_a': user_security_q.security_a,
     }
     return Response(data, status=status.HTTP_200_OK)
-
-
-
 
 
 @api_view(['PUT'])
@@ -196,7 +169,7 @@ def update_profile(request):
         user = User.objects.get(id=user_id)
     except User.DoesNotExist:
         return Response({"Error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
-    # username = request.data.get('username')
+
     username=user.username
 
     email = request.data.get('email')
