@@ -2,23 +2,30 @@ from django.db.models import Q
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+
 from utility.authentication_helper import generate_refresh_token, generate_access_token, is_auth
 from .models import User
-from .serializer import LoginSerializer,UserProfileSerializer,UserSerializer
-from .validator import verifying_user_login, verifying_signup_request
-from rest_framework.permissions import IsAuthenticated
+from .serializer import LoginSerializer, UserProfileSerializer
+from .validator import verifying_user_login, verifying_signup_request, verifying_refresh_token
+
+
 @api_view(['POST'])
 def signup_api(request):
     if not verifying_signup_request(request):
         return Response({"Error": "Invalid request body"}, status=status.HTTP_400_BAD_REQUEST)
     username = request.data.get('username')
     email = request.data.get('email')
+
+    # Create the user
+
     user = User(username=username, email=email)
     user.set_password(request.data.get('password'))
     if not email:
         user.email = f"{username}@yopmal.com"
     user.save()
     return Response({"Success": "User Created Successfully"}, status=status.HTTP_200_OK)
+
+
 @api_view(['POST'])
 def user_login(request):
     if not verifying_user_login(request):
@@ -42,10 +49,12 @@ def user_login(request):
         "access_token": access_token,
         "refresh_token": refresh_token
     })
-    user.refresh_token=str(refresh_token)
-    user.is_login=True
+    user.refresh_token = str(refresh_token)
+    user.is_login = True
     user.save()
     return Response(user_data, status=status.HTTP_200_OK)
+
+
 @api_view(['PUT'])
 @is_auth
 def update_profile(request):
@@ -54,12 +63,15 @@ def update_profile(request):
         user = User.objects.get(id=user_id)
     except User.DoesNotExist:
         return Response({"Error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
-    username=user.username
+    username = user.username
     email = request.data.get('email')
     if email:
         user.email = email
     else:
+
         user.email = f"{username}@yopmal.com"
+        user.email = f"{username}@yopmal.com"
+
     user.first_name = request.data.get('first_name')
     user.last_name = request.data.get('last_name')
     user.gender = request.data.get('gender')
@@ -67,6 +79,8 @@ def update_profile(request):
     user.phone_no = request.data.get('phone_no')
     user.save()
     return Response({"Success": "Profile Updated Successfully"}, status=status.HTTP_200_OK)
+
+
 @api_view(['POST'])
 @is_auth
 def user_logout(request):
@@ -74,13 +88,15 @@ def user_logout(request):
         user_id = request.user_id
         user = User.objects.get(id=user_id)
         user.refresh_token = ""
-        user.is_login=False
+        user.is_login = False
         user.save()
         return Response({'success': True, 'message': 'Logged out successfully'}, status=status.HTTP_200_OK)
     except User.DoesNotExist:
         return Response({'success': False, 'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
         return Response({'success': False, 'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
 @api_view(['GET'])
 @is_auth
 def get_profile(request):
@@ -91,6 +107,8 @@ def get_profile(request):
         return Response({"Error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
     serializer = UserProfileSerializer(user)
     return Response(serializer.data, status=status.HTTP_200_OK)
+
+
 @api_view(['DELETE'])
 @is_auth
 def user_delete(request):
@@ -100,7 +118,21 @@ def user_delete(request):
         user.delete()
         return Response({'success': True, 'message': 'User deleted successfully'}, status=status.HTTP_200_OK)
     except User.DoesNotExist:
-         return Response({'success': False, 'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+        return Response({'success': False, 'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
         return Response({'success': False, 'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
+@api_view(['POST'])
+def get_refresh_token(request):
+    if not verifying_refresh_token(request):
+        return Response({"Error": "Invalid Request Body"}, status=status.HTTP_400_BAD_REQUEST)
+    refresh_token = request.data.get('refresh_token')
+    user = User.objects.get(refresh_token=refresh_token)
+    new_refresh_token = generate_refresh_token(user)
+    access_token = generate_access_token(user)
+    if refresh_token:
+        user.refresh_token = new_refresh_token
+    user.save()
+    return Response({"refresh_token": new_refresh_token,
+                     "access_token": access_token}, status=status.HTTP_200_OK)
