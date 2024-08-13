@@ -5,9 +5,9 @@ from django.contrib.auth.hashers import check_password, make_password
 class User(models.Model):
     username = models.CharField(max_length=50, unique=True)
     email = models.EmailField(unique=True)
-    first_name = models.CharField(max_length=50, default=None,blank=True)
-    last_name = models.CharField(max_length=50, default=None,blank=True)
-    gender = models.CharField(max_length=10, default=None,blank=True)
+    first_name = models.CharField(max_length=50, default=None,blank=True,null=True)
+    last_name = models.CharField(max_length=50, default=None,blank=True,null=True)
+    gender = models.CharField(max_length=10, default=None,blank=True,null=True)
     dob = models.CharField(max_length=20, default=None, null=True, blank=True)
     password = models.CharField(max_length=500)
     phone_no = models.IntegerField(default=0,null=True)
