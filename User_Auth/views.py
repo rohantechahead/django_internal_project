@@ -117,18 +117,19 @@ def user_logout(request):
 @is_auth
 def user_delete(request):
     try:
+        # Retrieve the authenticated user's ID from the request object
         user_id = request.user_id
 
+        # Fetch the user instance from the database using the user_id
         user = User.objects.get(id=user_id)
 
-        #delete database
+        #delete the user from database
         user.delete()
 
         return Response({'success': True, 'message': 'User deleted successfully'}, status=status.HTTP_200_OK)
 
     except User.DoesNotExist:
          return Response({'success': False, 'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
-
 
     except Exception as e:
         return Response({'success': False, 'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
