@@ -1,6 +1,8 @@
 from rest_framework import serializers
 
-from .models import User
+
+from .models import User, UsersecurityQuestion
+
 
 
 class LoginSerializer(serializers.ModelSerializer):
@@ -10,7 +12,15 @@ class LoginSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.Serializer):
     class Meta:
         model = User
-        fields = ('__all__')
+        # fields = ('__all__')
+        fields = ['id', 'username', 'email']
+
+class UsersecurityQuestionSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = UsersecurityQuestion
+        fields = ['id', 'user_id', 'security_q', 'security_a']
+
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
