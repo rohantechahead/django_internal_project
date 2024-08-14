@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Black">
+    <option name="sdkName" value="Python 3.12 (env)" />
+  </component>
+<<<<<<< HEAD
+<<<<<<< Updated upstream
+</project>
+=======
+  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.11 (social_media_api)" project-jdk-type="Python SDK" />
+  <component name="PyCharmProfessionalAdvertiser">
+    <option name="shown" value="true" />
+  </component>
+</project>
+>>>>>>> Stashed changes
+=======
+  <component name="PyCharmProfessionalAdvertiser">
+    <option name="shown" value="true" />
+  </component>
+</project>
+>>>>>>> 06b9007c0892b5da0538a9e6ba9f959940edcbc3
