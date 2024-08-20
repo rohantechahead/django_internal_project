@@ -150,7 +150,7 @@ def update_security_q_a(request):
 @is_auth
 def get_security_q_a(request):
     user_id = request.user_id
-    print("user_id-->", user_id)
+
     try:
         user = User.objects.get(id=user_id)
     except User.DoesNotExist:

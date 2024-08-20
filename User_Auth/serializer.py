@@ -12,7 +12,7 @@ class LoginSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.Serializer):
     class Meta:
         model = User
-        # fields = ('__all__')
+
         fields = ['id', 'username', 'email']
 
 class UsersecurityQuestionSerializer(serializers.ModelSerializer):
