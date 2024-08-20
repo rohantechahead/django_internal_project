@@ -1,10 +1,11 @@
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from pathlib import Path
+
 from django.template.loader import render_to_string
 
 from intern_network.settings import EmailConstants
+
 
 def send_email(subject, plain_text_body, template_name, context, to_email):
     sender_email = EmailConstants.EMAIL_HOST_USER
@@ -44,6 +45,3 @@ def send_email(subject, plain_text_body, template_name, context, to_email):
     finally:
         # Terminate the session
         server.quit()
-
-
-
