@@ -1,17 +1,26 @@
 from django.contrib.auth.hashers import make_password
 from django.db.models import Q
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
+from utility.api_documantion_helper import (login_api_doc, signup_api_doc, forgot_api_doc,
+ update_security_api_doc, get_security_api_doc, logout_api_doc,update_profile_api_doc,get_profile_api_doc,
+                                            user_delete_api_doc,get_refresh_token_api_doc)
+
 from utility.authentication_helper import generate_refresh_token, generate_access_token, is_auth
 from utility.email_utils import send_email
 from .models import User, UsersecurityQuestion
+
 from .serializer import LoginSerializer, UserProfileSerializer
 from .validator import verifying_user_login, verifying_signup_request, verifying_forgotpassword_request, \
     verifying_refresh_token
 
 
+
+@signup_api_doc
 @api_view(['POST'])
 def signup_api(request):
     # Validate the signup request
@@ -48,6 +57,7 @@ def signup_api(request):
     return Response({"Success": "User Created Successfully"}, status=status.HTTP_200_OK)
 
 
+@login_api_doc
 @api_view(['POST'])
 def user_login(request):
     if not verifying_user_login(request):
@@ -78,6 +88,7 @@ def user_login(request):
     return Response(user_data, status=status.HTTP_200_OK)
 
 
+@forgot_api_doc
 @api_view(['POST'])
 def forgot_password_api(request):
     if not verifying_forgotpassword_request(request):
@@ -106,6 +117,7 @@ def forgot_password_api(request):
     return Response({'success': True, 'message': 'Password reset successfully'}, status=status.HTTP_200_OK)
 
 
+@update_security_api_doc
 @api_view(['PUT'])
 @is_auth
 def update_security_q_a(request):
@@ -133,10 +145,12 @@ def update_security_q_a(request):
         return Response({'error': 'Security question not found'}, status=status.HTTP_404_NOT_FOUND)
 
 
+@get_security_api_doc
 @api_view(['GET'])
 @is_auth
 def get_security_q_a(request):
     user_id = request.user_id
+
     try:
         user = User.objects.get(id=user_id)
     except User.DoesNotExist:
@@ -154,6 +168,7 @@ def get_security_q_a(request):
     return Response(data, status=status.HTTP_200_OK)
 
 
+@update_profile_api_doc
 @api_view(['PUT'])
 @is_auth
 def update_profile(request):
@@ -183,6 +198,7 @@ def update_profile(request):
     return Response({"Success": "Profile Updated Successfully"}, status=status.HTTP_200_OK)
 
 
+@logout_api_doc
 @api_view(['POST'])
 @is_auth
 def user_logout(request):
@@ -218,6 +234,7 @@ def user_logout(request):
         return Response({'success': False, 'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+@get_profile_api_doc
 @api_view(['GET'])
 @is_auth
 def get_profile(request):
@@ -230,6 +247,7 @@ def get_profile(request):
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+@user_delete_api_doc
 @api_view(['DELETE'])
 @is_auth
 def user_delete(request):
@@ -244,6 +262,7 @@ def user_delete(request):
         return Response({'success': False, 'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+@get_refresh_token_api_doc
 @api_view(['POST'])
 def get_refresh_token(request):
     if not verifying_refresh_token(request):
@@ -269,7 +288,7 @@ def send_test_email(request):
         "sender_name": "Jane Smith",
         "accept_request_link": "https://example.com/accept-request"
     }
-    to_email = "prathmesh@yopmail.com"
+    to_email = "afzal@yopmail.com"
     send_email(subject, plain_text_body, html_template_path, context, to_email)
     return Response({"Success": "Email sent successfully"}, status=status.HTTP_200_OK)
 

@@ -10,7 +10,7 @@ class User(models.Model):
     gender = models.CharField(max_length=10, default=None,blank=True,null=True)
     dob = models.DateField(null=True,default=None)
     password = models.CharField(max_length=500)
-    phone_no = models.IntegerField(default=0,null=True)
+    phone_no = models.BigIntegerField(null=True,default=None )
     refresh_token = models.CharField(max_length=200, default='None')
     is_login = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)

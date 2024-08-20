@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 from functools import wraps
 
+
 import jwt
 from django.conf import settings
 from django.http import JsonResponse
@@ -10,7 +11,7 @@ from rest_framework import status
 SECRET_KEY = settings.SECRET_KEY
 
 # Token expiration time
-ACCESS_TOKEN_LIFETIME = timedelta(minutes=5)
+ACCESS_TOKEN_LIFETIME = timedelta(minutes=45)
 REFRESH_TOKEN_LIFETIME = timedelta(days=1)
 
 
