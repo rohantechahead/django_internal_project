@@ -1,6 +1,5 @@
 from cerberus import Validator
 
-
 def verifying_signup_request(request):
     # Define the validation schema
     schema = {

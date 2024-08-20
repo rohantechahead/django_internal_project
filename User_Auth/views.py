@@ -1,19 +1,18 @@
-from functools import wraps
-
 from django.contrib.auth.hashers import make_password
 from django.db.models import Q
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from utility.authentication_helper import generate_refresh_token, generate_access_token, is_auth
 
+from utility.authentication_helper import generate_refresh_token, generate_access_token, is_auth
+from utility.email_utils import send_email
 from .models import User, UsersecurityQuestion
-from .serializer import LoginSerializer
-from .validator import verifying_user_login, verifying_signup_request, verifying_forgotpassword_request
+from .serializer import LoginSerializer, UserProfileSerializer
+from .validator import verifying_user_login, verifying_signup_request, verifying_forgotpassword_request, \
+    verifying_refresh_token
 
 
 @api_view(['POST'])
-
 def signup_api(request):
     # Validate the signup request
     if not verifying_signup_request(request):
@@ -258,3 +257,19 @@ def get_refresh_token(request):
     user.save()
     return Response({"refresh_token": new_refresh_token,
                      "access_token": access_token}, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+def send_test_email(request):
+    subject = "New Friend Request"
+    plain_text_body = "You have received a new friend request."
+    html_template_path = "friend_request_email.html"  # Updated path
+    context = {
+        "recipient_name": "John Doe",
+        "sender_name": "Jane Smith",
+        "accept_request_link": "https://example.com/accept-request"
+    }
+    to_email = "prathmesh@yopmail.com"
+    send_email(subject, plain_text_body, html_template_path, context, to_email)
+    return Response({"Success": "Email sent successfully"}, status=status.HTTP_200_OK)
+
