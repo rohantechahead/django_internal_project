@@ -60,7 +60,6 @@ def signup_api(request):
 @login_api_doc
 @api_view(['POST'])
 def user_login(request):
-    print(f"Request data: {request.data}")
     if not verifying_user_login(request):
         return Response({'success': False, 'message': 'Invalid data'}, status=400)
     username_or_email = request.data.get('username')
