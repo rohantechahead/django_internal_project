@@ -37,14 +37,15 @@ def verifying_user_login(request):
 def verifying_forgotpassword_request(request):
 
     schema = {
-        'old_password': {'type': 'string', 'minlength': 8, 'maxlength': 128, 'required': True},
+        # 'old_password': {'type': 'string', 'minlength': 8, 'maxlength': 128, 'required': True},
+        'security_a': {'type': 'string', 'required': True},
+
+        'security_q': {'type': 'string', 'required': True},
     }
     if 'username' in request.data:
         schema.update({
             'username': {'type': 'string', 'required': True},
-            'security_a': {'type': 'string',  'required': True},
 
-            'security_q': {'type': 'string', 'required': True},
             'new_password': {'type': 'string',  'required': True},
         })
     else:
