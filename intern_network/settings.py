@@ -135,8 +135,7 @@ class EmailConstants:
     EMAIL_HOST_USER = env('EMAIL_HOST_USER')
     EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
     EMAIL_USE_TLS = True
-html_template_path = os.path.join(BASE_DIR, 'templates', 'email', 'friend_request.html')
-
+    
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
