@@ -3,7 +3,7 @@ from .views import user_login, signup_api, forgot_password_api, update_security_
 from .views import user_login, signup_api, update_profile, user_logout
 
 from .views import get_profile, user_delete
-from .views import user_login, signup_api, update_profile, user_logout, get_refresh_token
+from .views import user_login, signup_api, update_profile, user_logout, get_refresh_token,send_test_email
 
 urlpatterns = [
     path('signup/', signup_api, name='signup'),
@@ -18,7 +18,7 @@ urlpatterns = [
     path('profile/', get_profile, name='profile'),
     path('delete/', user_delete, name='delete'),
 
-    path('get-profile/', update_profile, name='get-profile'),
-    path('refresh-token/', get_refresh_token, name='refresh-token')
+    path('refresh-token/', get_refresh_token, name='refresh-token'),
+    path('send-email/', send_test_email, name='send_test_email'),
 
 ]
