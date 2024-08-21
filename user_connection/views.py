@@ -31,11 +31,11 @@ def send_request(request):
     if not receiver:
         return Response({"error": "Receiver not found"}, status=status.HTTP_404_NOT_FOUND)
 
-    # Check if the connection request already exists
+
     if UserConnection.objects.filter(sender_id=sender, receiver_id=receiver).exists():
         return Response({"error": "Request already sent"}, status=status.HTTP_400_BAD_REQUEST)
 
-    # Create the connection request
+
     connection = UserConnection.objects.create(sender_id=sender, receiver_id=receiver)
     serializer = UserConnectionSerializer(connection)
 
@@ -62,11 +62,6 @@ def withdraw_send_request(request):
     if not receiver:
         return Response({"error": "Receiver not found"}, status=status.HTTP_404_NOT_FOUND)
 
-    # # Check if the connection request already exists
-    # if UserConnection.objects.filter(sender_id=sender, receiver_id=receiver).exists():
-    #     return Response({"error": "Request already sent"}, status=status.HTTP_400_BAD_REQUEST)
-
-    # Create the connection request
     connection = UserConnection.objects.filter(sender_id=sender, receiver_id=receiver)
     connection.delete()
     return Response({"message": "Request Withdrawn successfully"}, status=status.HTTP_200_OK)
