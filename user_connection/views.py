@@ -2,13 +2,14 @@ from rest_framework import status
 from django.shortcuts import render
 from rest_framework.response import Response
 from User_Auth.models import User
+from utility.api_documantion_helper import send_request_api_doc
 from utility.authentication_helper import is_auth
 from.validators import verifying_user_connection_request
 from rest_framework.decorators import api_view
-from rest_framework.views import APIView
 from.models import UserConnection
 from.serializers import UserConnectionSerializer
 
+@send_request_api_doc
 @api_view(['POST'])
 @is_auth
 def send_request(request):
