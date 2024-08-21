@@ -10,6 +10,7 @@ from utility.api_documantion_helper import (login_api_doc, signup_api_doc, forgo
  update_security_api_doc, get_security_api_doc, logout_api_doc,update_profile_api_doc,get_profile_api_doc,
                                             user_delete_api_doc,get_refresh_token_api_doc)
 
+
 from utility.authentication_helper import generate_refresh_token, generate_access_token, is_auth
 from utility.email_utils import send_email
 from .models import User, UsersecurityQuestion
@@ -60,6 +61,7 @@ def signup_api(request):
 @login_api_doc
 @api_view(['POST'])
 def user_login(request):
+    print(f"Request data: {request.data}")
     if not verifying_user_login(request):
         return Response({'success': False, 'message': 'Invalid data'}, status=400)
     username_or_email = request.data.get('username')
@@ -150,6 +152,7 @@ def update_security_q_a(request):
 @is_auth
 def get_security_q_a(request):
     user_id = request.user_id
+
 
     try:
         user = User.objects.get(id=user_id)

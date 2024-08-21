@@ -17,7 +17,9 @@ urlpatterns = [
     path('profile/', get_profile, name='profile'),
     path('delete/', user_delete, name='delete'),
 
+
     path('refresh-token/', get_refresh_token, name='refresh-token'),
     path('send-email/', send_test_email, name='send_test_email'),
+
 
 ]
