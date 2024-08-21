@@ -13,13 +13,22 @@ class UserConnection(models.Model):
         REJECTED = 'Rejected', 'Request Rejected'
         BLOCKED = 'Blocked', 'Blocked'
 
-
     status = models.CharField(
         max_length=8,
         choices=Status.choices,
         default=Status.PENDING,
     )
-    sender_id = models.ForeignKey(User, on_delete=models.CASCADE,related_name="sent_connections")
-    receiver_id = models.ForeignKey(User, on_delete=models.CASCADE,related_name="received_connections")
+    sender_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name="sent_connections")
+    receiver_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name="received_connections")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+
+class BlockedUser(models.Model):
+    blocker_id = models.ForeignKey(User, related_name="blocked_from", on_delete=models.CASCADE)
+    blocked_id = models.ForeignKey(User, related_name="blocked_to", on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ('blocker_id', 'blocked_id')
