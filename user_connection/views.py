@@ -1,6 +1,7 @@
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+
 from User_Auth.models import User
 from utility.api_documantion_helper import block_user_api_doc
 from utility.api_documantion_helper import send_request_api_doc, withdraw_send_request_api_doc
@@ -9,6 +10,7 @@ from utility.email_utils import send_email
 from .models import UserConnection, BlockedUser
 from .serializers import UserConnectionSerializer, BlockedUserSerializer
 from .validators import verifying_user_connection_request
+
 
 @send_request_api_doc
 @api_view(['POST'])
@@ -99,7 +101,7 @@ def block_user(request):
     if BlockedUser.objects.filter(blocker_id=user_id, blocked_id=blocked_user_id).exists():
         return Response({"error": "User is already blocked"}, status=status.HTTP_400_BAD_REQUEST)
 
-    block_entry = BlockedUser.objects.create(blocker_id=user_id, blocked_id=blocked_user_id)
+    block_entry = BlockedUser.objects.create(blocker_id_id=user_id, blocked_id_id=blocked_user_id)
     serializer = BlockedUserSerializer(block_entry)
 
     return Response({"message": "User blocked successfully", "data": serializer.data}, status=status.HTTP_201_CREATED)
