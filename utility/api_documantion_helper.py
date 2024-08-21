@@ -605,7 +605,7 @@ def send_request_api_doc(func):
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
             properties={
-                'receiver_id': openapi.Schema(type=openapi.TYPE_INTEGER, description='The receiver_id tells about the receiver'),
+                'receiver_id': openapi.Schema(type=openapi.TYPE_INTEGER, description='The receiver_id gives us the receivers user_id '),
             },
             required=['receiver_id']
         ),
