@@ -1,19 +1,14 @@
 from rest_framework import status
-from django.shortcuts import render
+from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from User_Auth.models import User
+from utility.api_documantion_helper import block_user_api_doc
 from utility.api_documantion_helper import send_request_api_doc, withdraw_send_request_api_doc
 from utility.authentication_helper import is_auth
-
-from .validators import verifying_user_connection_request
-
 from utility.email_utils import send_email
-from.validators import verifying_user_connection_request
-from rest_framework.decorators import api_view
-from rest_framework.views import APIView
 from .models import UserConnection, BlockedUser
-from utility.api_documantion_helper import block_user_api_doc
 from .serializers import UserConnectionSerializer, BlockedUserSerializer
+from .validators import verifying_user_connection_request
 
 @send_request_api_doc
 @api_view(['POST'])
@@ -43,7 +38,6 @@ def send_request(request):
     connection = UserConnection.objects.create(sender_id=sender, receiver_id=receiver)
     serializer = UserConnectionSerializer(connection)
 
-  
     subject = "New Friend Request"
     plain_text_body = "You have received a new friend request."
     html_template_path = "friend_request_email.html"

@@ -1,4 +1,5 @@
 from functools import wraps
+
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.decorators import api_view
@@ -39,7 +40,6 @@ def signup_api_doc(func):
             )
         }
     )
-
     @wraps(func)
     def wrap(request, *args, **kwargs):
         return func(request, *args, **kwargs)
@@ -155,7 +155,6 @@ def logout_api_doc(func):
     return wrap
 
 
-
 def forgot_api_doc(func):
     @swagger_auto_schema(
         method='post',
@@ -225,7 +224,7 @@ def update_security_api_doc(func):
                 'security_q': openapi.Schema(type=openapi.TYPE_STRING, description='Security question'),
                 'security_a': openapi.Schema(type=openapi.TYPE_STRING, description='Answer to the security question'),
             },
-            required=['username','security_q', 'security_a']
+            required=['username', 'security_q', 'security_a']
         ),
         manual_parameters=[
             openapi.Parameter(
@@ -311,7 +310,8 @@ def get_security_api_doc(func):
                     type=openapi.TYPE_OBJECT,
                     properties={
                         'security_q': openapi.Schema(type=openapi.TYPE_STRING, description='Security question'),
-                        'security_a': openapi.Schema(type=openapi.TYPE_STRING, description='Answer to the security question'),
+                        'security_a': openapi.Schema(type=openapi.TYPE_STRING,
+                                                     description='Answer to the security question'),
                     }
                 ),
                 examples={
@@ -346,7 +346,6 @@ def get_security_api_doc(func):
     return wrap
 
 
-
 def update_profile_api_doc(func):
     @swagger_auto_schema(
         method='put',
@@ -358,7 +357,8 @@ def update_profile_api_doc(func):
                 'first_name': openapi.Schema(type=openapi.TYPE_STRING, description='User first name'),
                 'last_name': openapi.Schema(type=openapi.TYPE_STRING, description='User last name'),
                 'gender': openapi.Schema(type=openapi.TYPE_STRING, description='User gender'),
-                'dob': openapi.Schema(type=openapi.TYPE_STRING, description='User date of birth', format=openapi.FORMAT_DATE),
+                'dob': openapi.Schema(type=openapi.TYPE_STRING, description='User date of birth',
+                                      format=openapi.FORMAT_DATE),
                 'phone_no': openapi.Schema(type=openapi.TYPE_STRING, description='User phone number'),
             },
             required=['first_name', 'last_name', 'gender', 'dob', 'phone_no']
@@ -447,10 +447,13 @@ def get_profile_api_doc(func):
                         'first_name': openapi.Schema(type=openapi.TYPE_STRING, description='User first name'),
                         'last_name': openapi.Schema(type=openapi.TYPE_STRING, description='User last name'),
                         'gender': openapi.Schema(type=openapi.TYPE_STRING, description='User gender'),
-                        'dob': openapi.Schema(type=openapi.TYPE_STRING, description='User date of birth', format=openapi.FORMAT_DATE),
+                        'dob': openapi.Schema(type=openapi.TYPE_STRING, description='User date of birth',
+                                              format=openapi.FORMAT_DATE),
                         'phone_no': openapi.Schema(type=openapi.TYPE_STRING, description='User phone number'),
-                        'created_at': openapi.Schema(type=openapi.TYPE_STRING, description='Account creation date', format=openapi.FORMAT_DATETIME),
-                        'updated_at': openapi.Schema(type=openapi.TYPE_STRING, description='Last update date', format=openapi.FORMAT_DATETIME),
+                        'created_at': openapi.Schema(type=openapi.TYPE_STRING, description='Account creation date',
+                                                     format=openapi.FORMAT_DATETIME),
+                        'updated_at': openapi.Schema(type=openapi.TYPE_STRING, description='Last update date',
+                                                     format=openapi.FORMAT_DATETIME),
                     }
                 ),
             ),
@@ -544,7 +547,8 @@ def get_refresh_token_api_doc(func):
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
             properties={
-                'refresh_token': openapi.Schema(type=openapi.TYPE_STRING, description='The refresh token used to generate new tokens'),
+                'refresh_token': openapi.Schema(type=openapi.TYPE_STRING,
+                                                description='The refresh token used to generate new tokens'),
             },
             required=['refresh_token']
         ),
@@ -735,8 +739,6 @@ def withdraw_send_request_api_doc(func):
 
     return wrap
 
-
-
 def block_user_api_doc(func):
     @swagger_auto_schema(
         method='post',
@@ -744,7 +746,8 @@ def block_user_api_doc(func):
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
             properties={
-                    'blocked_user_id': openapi.Schema(type=openapi.TYPE_INTEGER, description='block user id for block the user'),
+                'blocked_user_id': openapi.Schema(type=openapi.TYPE_INTEGER,
+                                                  description='block user id for block the user'),
             },
             required=['blocked_user_id']
         ),
@@ -795,3 +798,4 @@ def block_user_api_doc(func):
         return func(request, *args, **kwargs)
 
     return wrap
+
