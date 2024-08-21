@@ -20,4 +20,5 @@ urlpatterns = [
     path('refresh-token/', get_refresh_token, name='refresh-token'),
     path('send-email/', send_test_email, name='send_test_email'),
 
+
 ]
