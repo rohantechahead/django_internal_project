@@ -12,7 +12,6 @@ class LoginSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.Serializer):
     class Meta:
         model = User
-
         fields = ['id', 'username', 'email']
 
 class UsersecurityQuestionSerializer(serializers.ModelSerializer):

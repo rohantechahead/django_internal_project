@@ -1,9 +1,9 @@
 from functools import wraps
+
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-
 
 
 def signup_api_doc(func):
@@ -40,7 +40,6 @@ def signup_api_doc(func):
             )
         }
     )
-
     @wraps(func)
     def wrap(request, *args, **kwargs):
         return func(request, *args, **kwargs)
@@ -156,7 +155,6 @@ def logout_api_doc(func):
     return wrap
 
 
-
 def forgot_api_doc(func):
     @swagger_auto_schema(
         method='post',
@@ -226,7 +224,7 @@ def update_security_api_doc(func):
                 'security_q': openapi.Schema(type=openapi.TYPE_STRING, description='Security question'),
                 'security_a': openapi.Schema(type=openapi.TYPE_STRING, description='Answer to the security question'),
             },
-            required=['username','security_q', 'security_a']
+            required=['username', 'security_q', 'security_a']
         ),
         manual_parameters=[
             openapi.Parameter(
@@ -312,7 +310,8 @@ def get_security_api_doc(func):
                     type=openapi.TYPE_OBJECT,
                     properties={
                         'security_q': openapi.Schema(type=openapi.TYPE_STRING, description='Security question'),
-                        'security_a': openapi.Schema(type=openapi.TYPE_STRING, description='Answer to the security question'),
+                        'security_a': openapi.Schema(type=openapi.TYPE_STRING,
+                                                     description='Answer to the security question'),
                     }
                 ),
                 examples={
@@ -347,7 +346,6 @@ def get_security_api_doc(func):
     return wrap
 
 
-
 def update_profile_api_doc(func):
     @swagger_auto_schema(
         method='put',
@@ -359,7 +357,8 @@ def update_profile_api_doc(func):
                 'first_name': openapi.Schema(type=openapi.TYPE_STRING, description='User first name'),
                 'last_name': openapi.Schema(type=openapi.TYPE_STRING, description='User last name'),
                 'gender': openapi.Schema(type=openapi.TYPE_STRING, description='User gender'),
-                'dob': openapi.Schema(type=openapi.TYPE_STRING, description='User date of birth', format=openapi.FORMAT_DATE),
+                'dob': openapi.Schema(type=openapi.TYPE_STRING, description='User date of birth',
+                                      format=openapi.FORMAT_DATE),
                 'phone_no': openapi.Schema(type=openapi.TYPE_STRING, description='User phone number'),
             },
             required=['first_name', 'last_name', 'gender', 'dob', 'phone_no']
@@ -448,10 +447,13 @@ def get_profile_api_doc(func):
                         'first_name': openapi.Schema(type=openapi.TYPE_STRING, description='User first name'),
                         'last_name': openapi.Schema(type=openapi.TYPE_STRING, description='User last name'),
                         'gender': openapi.Schema(type=openapi.TYPE_STRING, description='User gender'),
-                        'dob': openapi.Schema(type=openapi.TYPE_STRING, description='User date of birth', format=openapi.FORMAT_DATE),
+                        'dob': openapi.Schema(type=openapi.TYPE_STRING, description='User date of birth',
+                                              format=openapi.FORMAT_DATE),
                         'phone_no': openapi.Schema(type=openapi.TYPE_STRING, description='User phone number'),
-                        'created_at': openapi.Schema(type=openapi.TYPE_STRING, description='Account creation date', format=openapi.FORMAT_DATETIME),
-                        'updated_at': openapi.Schema(type=openapi.TYPE_STRING, description='Last update date', format=openapi.FORMAT_DATETIME),
+                        'created_at': openapi.Schema(type=openapi.TYPE_STRING, description='Account creation date',
+                                                     format=openapi.FORMAT_DATETIME),
+                        'updated_at': openapi.Schema(type=openapi.TYPE_STRING, description='Last update date',
+                                                     format=openapi.FORMAT_DATETIME),
                     }
                 ),
             ),
@@ -545,7 +547,8 @@ def get_refresh_token_api_doc(func):
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
             properties={
-                'refresh_token': openapi.Schema(type=openapi.TYPE_STRING, description='The refresh token used to generate new tokens'),
+                'refresh_token': openapi.Schema(type=openapi.TYPE_STRING,
+                                                description='The refresh token used to generate new tokens'),
             },
             required=['refresh_token']
         ),
@@ -598,10 +601,201 @@ def get_refresh_token_api_doc(func):
 
     return wrap
 
+def send_request_api_doc(func):
+    @swagger_auto_schema(
+        method='post',
+        operation_description="Sending connection request for the user",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'receiver_id': openapi.Schema(type=openapi.TYPE_INTEGER, description='The receiver_id gives us the receivers user_id '),
+            },
+            required=['receiver_id']
+        ),
+        manual_parameters=[
+            openapi.Parameter(
+                'Authorization',
+                openapi.IN_HEADER,
+                description="Bearer token",
+                type=openapi.TYPE_STRING,
+                required=True,
+            ),
+        ],
+        responses={
+            200: openapi.Response(
+                description='Successfully Send Conncetion Request',
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'receiver_id': openapi.Schema(type=openapi.TYPE_INTEGER, description='New refresh token'),
 
+                    }
+                ),
+                examples={
+                    'application/json': {
+                        'message': 'Request sent Successfully',
 
+                    }
+                }
+            ),
+            400: openapi.Response(
+                description='Invalid request body',
+                examples={
+                    'application/json': {
+                        'Error': 'Invalid Request Body'
+                    }
+                }
+            ),
+            401: openapi.Response(
+                description='Unauthorized or invalid connection request',
+                examples={
+                    'application/json': {
+                        'Error': 'Unauthorized or invalid connection'
+                    }
+                }
+            ),
+            500: openapi.Response(
+                description='Internal server error',
+                examples={
+                    'application/json': {
+                        'Error': 'An unexpected error occurred'
+                    }
+                }
+            )
+        }
+    )
+    @wraps(func)
+    def wrap(request, *args, **kwargs):
+        return func(request, *args, **kwargs)
 
+    return wrap
 
+def withdraw_send_request_api_doc(func):
+    @swagger_auto_schema(
+        method='post',
+        operation_description="Withdrawing connection request for the user",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'receiver_id': openapi.Schema(type=openapi.TYPE_INTEGER,description='The receiver_id gives us the receivers user_id '),
+            },
+            required=['receiver_id']
+        ),
+        manual_parameters=[
+            openapi.Parameter(
+                'Authorization',
+                openapi.IN_HEADER,
+                description="Bearer token",
+                type=openapi.TYPE_STRING,
+                required=True,
+            ),
+        ],
+        responses={
+            200: openapi.Response(
+                description='Successfully Withdrawn Conncetion Request',
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'receiver_id': openapi.Schema(type=openapi.TYPE_INTEGER, description='New refresh token'),
 
+                    }
+                ),
+                examples={
+                    'application/json': {
+                        'message': 'Request Withdrawn Successfully',
 
+                    }
+                }
+            ),
+            400: openapi.Response(
+                description='Invalid request body',
+                examples={
+                    'application/json': {
+                        'Error': 'Invalid Request Body'
+                    }
+                }
+            ),
+            401: openapi.Response(
+                description='Unauthorized or invalid withdrawn request',
+                examples={
+                    'application/json': {
+                        'Error': 'Unauthorized or invalid withdraw request'
+                    }
+                }
+            ),
+            500: openapi.Response(
+                description='Internal server error',
+                examples={
+                    'application/json': {
+                        'Error': 'An unexpected error occurred'
+                    }
+                }
+            )
+        }
+    )
+    @wraps(func)
+    def wrap(request, *args, **kwargs):
+        return func(request, *args, **kwargs)
+
+    return wrap
+
+def block_user_api_doc(func):
+    @swagger_auto_schema(
+        method='post',
+        operation_description="Blocked user successfully.",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'blocked_user_id': openapi.Schema(type=openapi.TYPE_INTEGER,
+                                                  description='block user id for block the user'),
+            },
+            required=['blocked_user_id']
+        ),
+        manual_parameters=[
+            openapi.Parameter(
+                'Authorization',
+                openapi.IN_HEADER,
+                description="Bearer token",
+                type=openapi.TYPE_STRING,
+                required=True,
+            ),
+        ],
+        responses={
+            200: openapi.Response(
+                description='blocked user using blocked user id',
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'blocked_user_id': openapi.Schema(type=openapi.TYPE_INTEGER, description='New refresh token'),
+                    }
+                ),
+                examples={
+                    'application/json': {
+                        'message': 'blocked user successfully',
+                    }
+                }
+            ),
+            400: openapi.Response(
+                description='Invalid request body',
+                examples={
+                    'application/json': {
+                        'error': 'Invalid Request Body'
+                    }
+                }
+            ),
+            404: openapi.Response(
+                description='User not found',
+                examples={
+                    'application/json': {
+                        'error': 'User not found'
+                    }
+                }
+            )
+        }
+    )
+    @wraps(func)
+    def wrap(request, *args, **kwargs):
+        return func(request, *args, **kwargs)
+
+    return wrap
 

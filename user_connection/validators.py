@@ -11,6 +11,7 @@ def verifying_user_connection_request(request):
         return False
 
 
+
 def verifying_accept_reject_request(request):
    schema = {
             'sender_id': {'type': 'integer','required': True,'min': 1,'empty': False,},
@@ -21,6 +22,4 @@ def verifying_accept_reject_request(request):
        return True
    else:
        return False
-
-
 
