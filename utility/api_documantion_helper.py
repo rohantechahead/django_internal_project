@@ -739,6 +739,7 @@ def withdraw_send_request_api_doc(func):
 
     return wrap
 
+
 def block_user_api_doc(func):
     @swagger_auto_schema(
         method='post',
