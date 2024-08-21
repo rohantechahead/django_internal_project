@@ -4,7 +4,11 @@ from rest_framework.response import Response
 from User_Auth.models import User
 from utility.api_documantion_helper import send_request_api_doc, withdraw_send_request_api_doc
 from utility.authentication_helper import is_auth
+
 from .validators import verifying_user_connection_request
+
+from utility.email_utils import send_email
+from.validators import verifying_user_connection_request
 from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 from .models import UserConnection, BlockedUser
@@ -39,6 +43,17 @@ def send_request(request):
     connection = UserConnection.objects.create(sender_id=sender, receiver_id=receiver)
     serializer = UserConnectionSerializer(connection)
 
+  
+    subject = "New Friend Request"
+    plain_text_body = "You have received a new friend request."
+    html_template_path = "friend_request_email.html"
+    context = {
+        "recipient_name": receiver.username,
+        "sender_name": sender.username,
+        "accept_request_link": "https://example.com/accept-request"
+    }
+    to_email = receiver.email
+    send_email(subject, plain_text_body, html_template_path, context, to_email)
     return Response({"message": "Request sent successfully", "data": serializer.data}, status=status.HTTP_201_CREATED)
 
 
