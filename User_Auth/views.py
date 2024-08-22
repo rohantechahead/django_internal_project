@@ -1,23 +1,19 @@
 from django.contrib.auth.hashers import make_password
 from django.db.models import Q
-from drf_yasg import openapi
-from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from utility.api_documantion_helper import (login_api_doc, signup_api_doc, forgot_api_doc,
- update_security_api_doc, get_security_api_doc, logout_api_doc,update_profile_api_doc,get_profile_api_doc,
-                                            user_delete_api_doc,get_refresh_token_api_doc)
-
+                                            update_security_api_doc, get_security_api_doc, logout_api_doc,
+                                            update_profile_api_doc, get_profile_api_doc,
+                                            user_delete_api_doc, get_refresh_token_api_doc)
 from utility.authentication_helper import generate_refresh_token, generate_access_token, is_auth
 from utility.email_utils import send_email
 from .models import User, UsersecurityQuestion
-
 from .serializer import LoginSerializer, UserProfileSerializer
 from .validator import verifying_user_login, verifying_signup_request, verifying_forgotpassword_request, \
     verifying_refresh_token
-
 
 
 @signup_api_doc
@@ -291,4 +287,3 @@ def send_test_email(request):
     to_email = "afzal@yopmail.com"
     send_email(subject, plain_text_body, html_template_path, context, to_email)
     return Response({"Success": "Email sent successfully"}, status=status.HTTP_200_OK)
-

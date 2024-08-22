@@ -1,9 +1,9 @@
 from functools import wraps
+
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-
 
 
 def signup_api_doc(func):
@@ -40,7 +40,6 @@ def signup_api_doc(func):
             )
         }
     )
-
     @wraps(func)
     def wrap(request, *args, **kwargs):
         return func(request, *args, **kwargs)
@@ -156,7 +155,6 @@ def logout_api_doc(func):
     return wrap
 
 
-
 def forgot_api_doc(func):
     @swagger_auto_schema(
         method='post',
@@ -226,7 +224,7 @@ def update_security_api_doc(func):
                 'security_q': openapi.Schema(type=openapi.TYPE_STRING, description='Security question'),
                 'security_a': openapi.Schema(type=openapi.TYPE_STRING, description='Answer to the security question'),
             },
-            required=['username','security_q', 'security_a']
+            required=['username', 'security_q', 'security_a']
         ),
         manual_parameters=[
             openapi.Parameter(
@@ -312,7 +310,8 @@ def get_security_api_doc(func):
                     type=openapi.TYPE_OBJECT,
                     properties={
                         'security_q': openapi.Schema(type=openapi.TYPE_STRING, description='Security question'),
-                        'security_a': openapi.Schema(type=openapi.TYPE_STRING, description='Answer to the security question'),
+                        'security_a': openapi.Schema(type=openapi.TYPE_STRING,
+                                                     description='Answer to the security question'),
                     }
                 ),
                 examples={
@@ -347,7 +346,6 @@ def get_security_api_doc(func):
     return wrap
 
 
-
 def update_profile_api_doc(func):
     @swagger_auto_schema(
         method='put',
@@ -359,7 +357,8 @@ def update_profile_api_doc(func):
                 'first_name': openapi.Schema(type=openapi.TYPE_STRING, description='User first name'),
                 'last_name': openapi.Schema(type=openapi.TYPE_STRING, description='User last name'),
                 'gender': openapi.Schema(type=openapi.TYPE_STRING, description='User gender'),
-                'dob': openapi.Schema(type=openapi.TYPE_STRING, description='User date of birth', format=openapi.FORMAT_DATE),
+                'dob': openapi.Schema(type=openapi.TYPE_STRING, description='User date of birth',
+                                      format=openapi.FORMAT_DATE),
                 'phone_no': openapi.Schema(type=openapi.TYPE_STRING, description='User phone number'),
             },
             required=['first_name', 'last_name', 'gender', 'dob', 'phone_no']
@@ -448,10 +447,13 @@ def get_profile_api_doc(func):
                         'first_name': openapi.Schema(type=openapi.TYPE_STRING, description='User first name'),
                         'last_name': openapi.Schema(type=openapi.TYPE_STRING, description='User last name'),
                         'gender': openapi.Schema(type=openapi.TYPE_STRING, description='User gender'),
-                        'dob': openapi.Schema(type=openapi.TYPE_STRING, description='User date of birth', format=openapi.FORMAT_DATE),
+                        'dob': openapi.Schema(type=openapi.TYPE_STRING, description='User date of birth',
+                                              format=openapi.FORMAT_DATE),
                         'phone_no': openapi.Schema(type=openapi.TYPE_STRING, description='User phone number'),
-                        'created_at': openapi.Schema(type=openapi.TYPE_STRING, description='Account creation date', format=openapi.FORMAT_DATETIME),
-                        'updated_at': openapi.Schema(type=openapi.TYPE_STRING, description='Last update date', format=openapi.FORMAT_DATETIME),
+                        'created_at': openapi.Schema(type=openapi.TYPE_STRING, description='Account creation date',
+                                                     format=openapi.FORMAT_DATETIME),
+                        'updated_at': openapi.Schema(type=openapi.TYPE_STRING, description='Last update date',
+                                                     format=openapi.FORMAT_DATETIME),
                     }
                 ),
             ),
@@ -545,7 +547,8 @@ def get_refresh_token_api_doc(func):
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
             properties={
-                'refresh_token': openapi.Schema(type=openapi.TYPE_STRING, description='The refresh token used to generate new tokens'),
+                'refresh_token': openapi.Schema(type=openapi.TYPE_STRING,
+                                                description='The refresh token used to generate new tokens'),
             },
             required=['refresh_token']
         ),
@@ -598,6 +601,7 @@ def get_refresh_token_api_doc(func):
 
     return wrap
 
+
 def send_request_api_doc(func):
     @swagger_auto_schema(
         method='post',
@@ -605,7 +609,8 @@ def send_request_api_doc(func):
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
             properties={
-                'receiver_id': openapi.Schema(type=openapi.TYPE_INTEGER, description='The receiver_id gives us the receivers user_id '),
+                'receiver_id': openapi.Schema(type=openapi.TYPE_INTEGER,
+                                              description='The receiver_id gives us the receivers user_id '),
             },
             required=['receiver_id']
         ),
@@ -667,6 +672,7 @@ def send_request_api_doc(func):
 
     return wrap
 
+
 def withdraw_send_request_api_doc(func):
     @swagger_auto_schema(
         method='post',
@@ -674,7 +680,8 @@ def withdraw_send_request_api_doc(func):
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
             properties={
-                'receiver_id': openapi.Schema(type=openapi.TYPE_INTEGER,description='The receiver_id gives us the receivers user_id '),
+                'receiver_id': openapi.Schema(type=openapi.TYPE_INTEGER,
+                                              description='The receiver_id gives us the receivers user_id '),
             },
             required=['receiver_id']
         ),
@@ -737,10 +744,130 @@ def withdraw_send_request_api_doc(func):
     return wrap
 
 
+# def list_connection_api_doc(func):
+#     @swagger_auto_schema(
+#         method='get',
+#         operation_description="User connection list retrieved successfully",
+#         request_body=openapi.Schema(
+#             type=openapi.TYPE_OBJECT,
+#             properties={
+#
+#             },
+#             required=['receiver_id']
+#         ),
+#         manual_parameters=[
+#             openapi.Parameter(
+#                 'Authorization',
+#                 openapi.IN_HEADER,
+#                 description="Bearer token",
+#                 type=openapi.TYPE_STRING,
+#                 required=True,
+#             ),
+#         ],
+#         responses={
+#             200: openapi.Response(
+#                 description="User connection list retrieved successfully",
+#                 schema=openapi.Schema(
+#                     type=openapi.TYPE_OBJECT,
+#                     properties={
+#                         'id': openapi.Schema(type=openapi.TYPE_INTEGER, description='ID'),
+#                         'sender_id': openapi.Schema(type=openapi.TYPE_INTEGER,description='sender_id'),
+#                         'receiver_id' : openapi.Schema(type=openapi.TYPE_INTEGER, description='receiver_id'),
+#                         'created_at': openapi.Schema(type=openapi.TYPE_STRING, description='request sending and receiving date',
+#                                                      format=openapi.FORMAT_DATETIME),
+#                         'updated_at': openapi.Schema(type=openapi.TYPE_STRING, description='Last update date',
+#                                                      format=openapi.FORMAT_DATETIME),
+#
+#                     }
+#                 ),
+#                 examples={
+#                     'application/json': {
+#                         'message': 'Request connection list Successfully',
+#
+#                     }
+#                 }
+#             ),
+#             400: openapi.Response(
+#                 description='Invalid request body',
+#                 examples={
+#                     'application/json': {
+#                         'Error': 'Invalid Request Body'
+#                     }
+#                 }
+#             ),
+#             401: openapi.Response(
+#                 description='Unauthorized or invalid body request',
+#                 examples={
+#                     'application/json': {
+#                         'Error': 'Unauthorized or invalid body request'
+#                     }
+#                 }
+#             ),
+#             500: openapi.Response(
+#                 description='Internal server error',
+#                 examples={
+#                     'application/json': {
+#                         'Error': 'An unexpected error occurred'
+#                     }
+#                 }
+#             )
+#         }
+#     )
+#     @wraps(func)
+#     def wrap(request, *args, **kwargs):
+#         return func(request, *args, **kwargs)
+#
+#     return wrap
+#
 
 
+def list_connection_api_doc(func):
+    @swagger_auto_schema(
+        method='get',
+        operation_description="Retrieve a list of user connection requests",
+        responses={
+            200: openapi.Response(
+                description="Connection requests fetched successfully",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'message': openapi.Schema(
+                            type=openapi.TYPE_STRING,
+                            description='Response message'
+                        ),
+                        'data': openapi.Schema(
+                            type=openapi.TYPE_ARRAY,
+                            items=openapi.Items(
+                                type=openapi.TYPE_OBJECT,
+                                properties={
+                                    'sender_id': openapi.Schema(
+                                        type=openapi.TYPE_INTEGER,
+                                        description='ID of the sender'
+                                    ),
+                                    'receiver_id': openapi.Schema(
+                                        type=openapi.TYPE_INTEGER,
+                                        description='ID of the receiver'
+                                    ),
+                                    'status': openapi.Schema(
+                                        type=openapi.TYPE_STRING,
+                                        description='Status of the connection'
+                                    ),
+                                }
+                            ),
+                            description='List of connection requests'
+                        ),
+                    },
+                    required=['message', 'data']
+                ),
+            ),
+            404: openapi.Response(
+                description="No connection requests found"
+            ),
+        }
+    )
+    @wraps(func)
+    def wrap(request, *args, **kwargs):
+        return func(request, *args, **kwargs)
 
-
-
-
+    return wrap
 
