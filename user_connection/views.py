@@ -67,9 +67,25 @@ def handle_friend_request(request):
     if not connection:
         return Response({"error": "Connection request not found."}, status=status.HTTP_404_NOT_FOUND)
 
+    sender = User.objects.get(id=sender_id)
+    receiver = User.objects.get(id=user_id)
+
     if action == 'accept':
 
         connection.status = UserConnection.Status.APPROVED
+
+        subject = "Your Friend Request was Accepted!"
+        plain_text_body = f"Hi {sender.username}, your friend request to {receiver.username} was accepted!"
+        html_template_path = "accept_request_email.html"  # Ensure this template exists
+        context = {
+            "recipient_name": sender.username,
+            "sender_name": receiver.username,
+            "connect_profile_link": "https://example.com/connect-profile"  # Replace with actual link
+        }
+        to_email = sender.email
+
+        # Assuming send_email is a function defined elsewhere in your codebase
+        send_email(subject, plain_text_body, html_template_path, context, to_email)
         connection.save()
 
         return Response({"status": "success", "message": "Connection request accepted. You are now connected."})

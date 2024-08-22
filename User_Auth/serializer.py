@@ -8,7 +8,7 @@ from .models import User, UsersecurityQuestion
 class LoginSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['username', 'email', 'created_at', 'updated_at']
+        fields = ['username', 'email', 'created_at', 'updated_at','id']
 class UserSerializer(serializers.Serializer):
     class Meta:
         model = User
