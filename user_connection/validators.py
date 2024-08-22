@@ -23,3 +23,16 @@ def verifying_accept_reject_request(request):
    else:
        return False
 
+
+def verifying_user_report(request):
+    schema = {
+        'reported_user_id': {'type': 'integer', 'required': True},
+        'reason': {'type': 'string', 'required': True, 'maxlength': 255}
+    }
+    v = Validator()
+    if v.validate(request.data, schema):
+        return True, None  # Return True and None when valid
+    else:
+        return False, v.errors  # Return False and the validation errors
+
+

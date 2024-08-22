@@ -3,12 +3,13 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from User_Auth.models import User
+from user_wish.validators import verifying_user_request
 from utility.api_documantion_helper import send_request_api_doc, withdraw_send_request_api_doc,accept_reject_api_doc,block_user_api_doc, report_user_api_doc
 from utility.authentication_helper import is_auth
 from utility.email_utils import send_email
 from .models import UserConnection, BlockedUser, ReportedUser
 from .serializers import UserConnectionSerializer, BlockedUserSerializer, ReportedUserSerializer
-from .validators import verifying_user_connection_request,verifying_accept_reject_request
+from .validators import verifying_user_connection_request,verifying_accept_reject_request, verifying_user_report
 
 
 @send_request_api_doc
@@ -139,6 +140,10 @@ def block_user(request):
 @api_view(['POST'])
 @is_auth
 def report_user(request):
+    is_valid, errors = verifying_user_report(request)
+    if not is_valid:
+        return Response({"errors": errors}, status=status.HTTP_400_BAD_REQUEST)
+
     user_id = request.user_id
     reported_user_id = request.data.get('reported_user_id')
     reason = request.data.get('reason')
