@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import UserConnection, BlockedUser
+from .models import UserConnection, BlockedUser, ReportedUser
 
 
 class UserConnectionSerializer(serializers.ModelSerializer):
@@ -23,3 +23,12 @@ class BlockedUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = BlockedUser
         fields = ['id', 'blocker_id', 'blocker_username', 'blocked_id', 'blocked_username', 'created_at']
+
+
+class ReportedUserSerializer(serializers.ModelSerializer):
+    reporter_username = serializers.CharField(source='reporter_id.username', read_only=True)
+    reported_username = serializers.CharField(source='reported_id.username', read_only=True)
+
+    class Meta:
+        model = ReportedUser
+        fields =   "__all__"
