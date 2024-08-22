@@ -31,8 +31,8 @@ def verifying_user_report(request):
     }
     v = Validator()
     if v.validate(request.data, schema):
-        return True, None  # Return True and None when valid
+        return True
     else:
-        return False, v.errors  # Return False and the validation errors
+        return False
 
 
