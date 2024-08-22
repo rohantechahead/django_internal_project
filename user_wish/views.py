@@ -37,3 +37,17 @@ def UserWishAdd(request):
     serializer = UserWishSerializers(connection)
     return Response({"message": "User Wish created successfully", "data": serializer.data},
                     status=status.HTTP_201_CREATED)
+
+@api_view(['GET'])
+@is_auth
+def get_user_wish(request):
+    userwish_id=request.data.get("userwish_id")
+
+    if not userwish_id:
+        return Response({"error": "userwish_id is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+    user_wish=UserWish.objects.filter(userwish_id=userwish_id)
+    serializer=UserWishSerializers(user_wish,many=True)
+    return Response(serializer.data,status=status.HTTP_200_OK)
+
+
