@@ -62,9 +62,7 @@ def handle_friend_request(request):
     action = request.data.get('action')
     user_id = request.user_id
 
-    connection = UserConnection.objects.filter(sender_id=sender_id,
-                                               receiver_id=user_id,
-                                               status=UserConnection.Status.PENDING).first()
+    connection = UserConnection.objects.filter(sender_id=sender_id,receiver_id=user_id,status=UserConnection.Status.PENDING).first()
 
     if not connection:
         return Response({"error": "Connection request not found."}, status=status.HTTP_404_NOT_FOUND)

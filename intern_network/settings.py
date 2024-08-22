@@ -45,7 +45,8 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     'drf_yasg',
     "User_Auth",
-    "user_connection"
+    "user_connection",
+    "user_wish",
 
 ]
 
