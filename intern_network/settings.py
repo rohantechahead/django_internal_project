@@ -46,7 +46,9 @@ INSTALLED_APPS = [
     'drf_yasg',
     "User_Auth",
     "user_connection"
+
 ]
+
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -65,6 +67,8 @@ SWAGGER_SETTINGS = {
         }
     }
 }
+
+
 
 ROOT_URLCONF = "intern_network.urls"
 

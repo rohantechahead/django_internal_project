@@ -37,6 +37,7 @@ def verifying_user_login(request):
 def verifying_forgotpassword_request(request):
 
     schema = {
+
         'security_a': {'type': 'string', 'required': True},
 
         'security_q': {'type': 'string', 'required': True},

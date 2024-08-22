@@ -601,6 +601,7 @@ def get_refresh_token_api_doc(func):
 
     return wrap
 
+
 def send_request_api_doc(func):
     @swagger_auto_schema(
         method='post',
@@ -670,6 +671,7 @@ def send_request_api_doc(func):
 
     return wrap
 
+
 def withdraw_send_request_api_doc(func):
     @swagger_auto_schema(
         method='post',
@@ -738,6 +740,86 @@ def withdraw_send_request_api_doc(func):
         return func(request, *args, **kwargs)
 
     return wrap
+
+
+def accept_reject_api_doc(func):
+    @swagger_auto_schema(
+        method='post',
+        operation_description="Handle friend request (accept or reject)",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'sender_id': openapi.Schema(type=openapi.TYPE_INTEGER, description='The sender_id of the friend request'),
+                'action': openapi.Schema(type=openapi.TYPE_STRING, description="Action to perform: 'accept' or 'reject'"),
+            },
+            required=['sender_id', 'action']
+        ),
+        manual_parameters=[
+            openapi.Parameter(
+                'Authorization',
+                openapi.IN_HEADER,
+                description="Bearer token",
+                type=openapi.TYPE_STRING,
+                required=True,
+            ),
+        ],
+        responses={
+            200: openapi.Response(
+                description='Successfully handled friend request',
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'status': openapi.Schema(type=openapi.TYPE_STRING, description='Request handling status'),
+                        'message': openapi.Schema(type=openapi.TYPE_STRING, description='Detailed message'),
+                    }
+                ),
+                examples={
+                    'application/json': {
+                        'status': 'success',
+                        'message': 'Connection request accepted. You are now connected.',
+                    }
+                }
+            ),
+            400: openapi.Response(
+                description='Invalid action or request body',
+                examples={
+                    'application/json': {
+                        'error': 'Invalid action',
+                    }
+                }
+            ),
+            401: openapi.Response(
+                description='Unauthorized request',
+                examples={
+                    'application/json': {
+                        'Error': 'Authorization Token is missing!',
+                    }
+                }
+            ),
+            404: openapi.Response(
+                description='Connection request not found',
+                examples={
+                    'application/json': {
+                        'error': 'Connection request not found.',
+                    }
+                }
+            ),
+            500: openapi.Response(
+                description='Internal server error',
+                examples={
+                    'application/json': {
+                        'Error': 'An unexpected error occurred',
+                    }
+                }
+            )
+        }
+    )
+    @wraps(func)
+    def wrap(request, *args, **kwargs):
+        return func(request, *args, **kwargs)
+
+    return wrap
+
 
 def block_user_api_doc(func):
     @swagger_auto_schema(
