@@ -824,7 +824,7 @@ def accept_reject_api_doc(func):
 def block_user_api_doc(func):
     @swagger_auto_schema(
         method='post',
-        operation_description="Blocked user successfully.",
+        operation_description="Blocked user....",
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
             properties={
@@ -848,12 +848,76 @@ def block_user_api_doc(func):
                 schema=openapi.Schema(
                     type=openapi.TYPE_OBJECT,
                     properties={
-                        'blocked_user_id': openapi.Schema(type=openapi.TYPE_INTEGER, description='New refresh token'),
+                        'blocked_user_id': openapi.Schema(type=openapi.TYPE_INTEGER, description='Add to block for using their user id'),
                     }
                 ),
                 examples={
                     'application/json': {
                         'message': 'blocked user successfully',
+                    }
+                }
+            ),
+            400: openapi.Response(
+                description='Invalid request body',
+                examples={
+                    'application/json': {
+                        'error': 'Invalid Request Body'
+                    }
+                }
+            ),
+            404: openapi.Response(
+                description='User not found',
+                examples={
+                    'application/json': {
+                        'error': 'User not found'
+                    }
+                }
+            )
+        }
+    )
+
+    @wraps(func)
+    def wrap(request, *args, **kwargs):
+        return func(request, *args, **kwargs)
+
+    return wrap
+
+def report_user_api_doc(func):
+    @swagger_auto_schema(
+        method='post',
+        operation_description="Report user",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'reported_user_id': openapi.Schema(type=openapi.TYPE_INTEGER,
+                                                  description='Reported user using their userid'),
+                'reason':openapi.Schema(type=openapi.TYPE_STRING,
+                                                  description='give some reason for report'),
+            },
+            required=['reported_user_id','reason']
+        ),
+        manual_parameters=[
+            openapi.Parameter(
+                'Authorization',
+                openapi.IN_HEADER,
+                description="Bearer token",
+                type=openapi.TYPE_STRING,
+                required=True,
+            ),
+        ],
+        responses={
+            200: openapi.Response(
+                description='Reported user using their user id',
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'reported_user_id': openapi.Schema(type=openapi.TYPE_INTEGER, description='repoter by using reported user id'),
+                        'reason': openapi.Schema(type=openapi.TYPE_STRING, description='reasons for report'),
+                    }
+                ),
+                examples={
+                    'application/json': {
+                        'message': 'Report user successfully',
                     }
                 }
             ),
@@ -943,4 +1007,5 @@ def UserWishAddapi_doc(func):
         return func(request, *args, **kwargs)
 
     return wrap
+
 

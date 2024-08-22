@@ -3,12 +3,13 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from User_Auth.models import User
-from utility.api_documantion_helper import send_request_api_doc, withdraw_send_request_api_doc,accept_reject_api_doc,block_user_api_doc
+from user_wish.validators import verifying_user_request
+from utility.api_documantion_helper import send_request_api_doc, withdraw_send_request_api_doc,accept_reject_api_doc,block_user_api_doc, report_user_api_doc
 from utility.authentication_helper import is_auth
 from utility.email_utils import send_email
-from .models import UserConnection, BlockedUser
-from .serializers import UserConnectionSerializer, BlockedUserSerializer
-from .validators import verifying_user_connection_request,verifying_accept_reject_request
+from .models import UserConnection, BlockedUser, ReportedUser
+from .serializers import UserConnectionSerializer, BlockedUserSerializer, ReportedUserSerializer
+from .validators import verifying_user_connection_request,verifying_accept_reject_request, verifying_user_report
 
 
 @send_request_api_doc
@@ -63,6 +64,7 @@ def handle_friend_request(request):
     user_id = request.user_id
 
     connection = UserConnection.objects.filter(sender_id=sender_id,receiver_id=user_id,status=UserConnection.Status.PENDING).first()
+
 
     if not connection:
         return Response({"error": "Connection request not found."}, status=status.HTTP_404_NOT_FOUND)
@@ -132,3 +134,34 @@ def block_user(request):
     serializer = BlockedUserSerializer(block_entry)
 
     return Response({"message": "User blocked successfully", "data": serializer.data}, status=status.HTTP_201_CREATED)
+
+
+@report_user_api_doc
+@api_view(['POST'])
+@is_auth
+def report_user(request):
+    if not verifying_user_report(request):
+        return Response({"message": "Report user not verified"}, status=status.HTTP_400_BAD_REQUEST)
+
+    user_id = request.user_id
+    reported_user_id = request.data.get('reported_user_id')
+    reason = request.data.get('reason')
+
+    try:
+        reported_user_id = int(reported_user_id)
+    except ValueError:
+        return Response({"error": "Reported user id must be a valid integer"}, status=status.HTTP_400_BAD_REQUEST)
+
+    reported_user = User.objects.filter(id=reported_user_id).first()
+    if not reported_user:
+        return Response({"error": "User does not exist"}, status=status.HTTP_404_NOT_FOUND)
+
+    # Check if the user has already reported
+    if ReportedUser.objects.filter(reporter_id=user_id, reported_id=reported_user_id).exists():
+        return Response({"error": "You have already reported this user"}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Create the report entry
+    report_entry = ReportedUser.objects.create(reporter_id_id=user_id, reported_id_id=reported_user_id, reason=reason)
+    serializer = ReportedUserSerializer(report_entry)
+
+    return Response({"message": "User reported successfully", "data": serializer.data}, status=status.HTTP_201_CREATED)

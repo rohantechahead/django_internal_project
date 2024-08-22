@@ -32,3 +32,13 @@ class BlockedUser(models.Model):
 
     class Meta:
         unique_together = ('blocker_id', 'blocked_id')
+
+
+class ReportedUser(models.Model):
+    reporter_id = models.ForeignKey(User, related_name="reported_by", on_delete=models.CASCADE)
+    reported_id = models.ForeignKey(User, related_name="reported_to", on_delete=models.CASCADE)
+    reason = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('reporter_id', 'reported_id')
