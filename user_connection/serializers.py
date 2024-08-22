@@ -1,12 +1,6 @@
 from rest_framework import serializers
-
-from .models import UserConnection
-
-<<<<<<< Updated upstream
 from .models import UserConnection, BlockedUser
 
-=======
->>>>>>> Stashed changes
 
 class UserConnectionSerializer(serializers.ModelSerializer):
     sender_username = serializers.CharField(source='sender_id.username', read_only=True)
