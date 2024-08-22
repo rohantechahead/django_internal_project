@@ -62,9 +62,6 @@ def handle_friend_request(request):
     action = request.data.get('action')
     user_id = request.user_id
 
-    if action not in ['accept', 'reject']:
-        return Response({"error": "Invalid action"}, status=status.HTTP_400_BAD_REQUEST)
-
     connection = UserConnection.objects.filter(sender_id=sender_id,
                                                receiver_id=user_id,
                                                status=UserConnection.Status.PENDING).first()
