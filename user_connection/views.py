@@ -140,9 +140,8 @@ def block_user(request):
 @api_view(['POST'])
 @is_auth
 def report_user(request):
-    is_valid, errors = verifying_user_report(request)
-    if not is_valid:
-        return Response({"errors": errors}, status=status.HTTP_400_BAD_REQUEST)
+    if not verifying_user_report(request):
+        return Response({"message": "Report user not verified"}, status=status.HTTP_400_BAD_REQUEST)
 
     user_id = request.user_id
     reported_user_id = request.data.get('reported_user_id')
@@ -152,9 +151,6 @@ def report_user(request):
         reported_user_id = int(reported_user_id)
     except ValueError:
         return Response({"error": "Reported user id must be a valid integer"}, status=status.HTTP_400_BAD_REQUEST)
-
-    if not reason:
-        return Response({"error": "Reason for reporting is required"}, status=status.HTTP_400_BAD_REQUEST)
 
     reported_user = User.objects.filter(id=reported_user_id).first()
     if not reported_user:
