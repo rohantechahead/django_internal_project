@@ -881,3 +881,66 @@ def block_user_api_doc(func):
 
     return wrap
 
+def UserWishAddapi_doc(func):
+    @swagger_auto_schema(
+        method='post',
+        operation_description="User Wish created successfully.",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'title': openapi.Schema(type=openapi.TYPE_STRING,description='It shows the special events'),
+                'description': openapi.Schema(type=openapi.TYPE_STRING, description='It shows the desire of the user'),
+                'tag_id': openapi.Schema(type=openapi.TYPE_INTEGER, description='It show the tag people id'),
+            },
+            required=['title','description','tag_id']
+        ),
+        manual_parameters=[
+            openapi.Parameter(
+                'Authorization',
+                openapi.IN_HEADER,
+                description="Bearer token",
+                type=openapi.TYPE_STRING,
+                required=True,
+            ),
+        ],
+        responses={
+            200: openapi.Response(
+                description='User wish created Successfully',
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'title': openapi.Schema(type=openapi.TYPE_STRING, description='It shows the special events'),
+                        'description': openapi.Schema(type=openapi.TYPE_STRING,description='It shows what he want for this event'),
+                        'tag_id': openapi.Schema(type=openapi.TYPE_INTEGER, description='It show the tag people id'),
+                    }
+                ),
+                examples={
+                    'application/json': {
+                        'message': 'User wish created succesfully',
+                    }
+                }
+            ),
+            400: openapi.Response(
+                description='Invalid request body',
+                examples={
+                    'application/json': {
+                        'error': 'Invalid Request Body'
+                    }
+                }
+            ),
+            404: openapi.Response(
+                description='User not found',
+                examples={
+                    'application/json': {
+                        'error': 'User not found'
+                    }
+                }
+            )
+        }
+    )
+    @wraps(func)
+    def wrap(request, *args, **kwargs):
+        return func(request, *args, **kwargs)
+
+    return wrap
+
