@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from rest_framework import status
 from rest_framework.decorators import api_view
 
@@ -7,8 +6,6 @@ from user_wish.models import UserWish
 from user_wish.serializers import UserWishSerializers
 from utility.api_documantion_helper import UserWishAddapi_doc
 from utility.authentication_helper import is_auth
-# from .models import userwish_id
-# from user_connection.validators import verifying_user_connection_request
 from .validators import verifying_user_request
 from rest_framework.response import Response
 
@@ -28,11 +25,6 @@ def UserWishAdd(request):
     title=request.data.get("title")
     description=request.data.get("description")
     tag_id=request.data.get("tag_id")
-
-    # try:
-    #     tag_user = User.objects.get(id=tag_id)
-    # except User.DoesNotExist:
-    #     return Response({"error": "Tag User not found"}, status=status.HTTP_404_NOT_FOUND)
     tag_user = User.objects.get(id=tag_id)
 
     tag = User.objects.filter(id=tag_id).first()
