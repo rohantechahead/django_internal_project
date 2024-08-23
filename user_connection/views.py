@@ -3,12 +3,14 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from User_Auth.models import User
-from utility.api_documantion_helper import send_request_api_doc, withdraw_send_request_api_doc,accept_reject_api_doc,block_user_api_doc,list_connection_api_doc
+from utility.api_documantion_helper import send_request_api_doc, withdraw_send_request_api_doc, accept_reject_api_doc, \
+    block_user_api_doc, list_connection_api_doc
 from utility.authentication_helper import is_auth
 from utility.email_utils import send_email
 from .models import UserConnection, BlockedUser
 from .serializers import UserConnectionSerializer, BlockedUserSerializer
-from .validators import verifying_user_connection_request,verifying_accept_reject_request
+from .validators import verifying_user_connection_request, verifying_accept_reject_request
+
 
 @send_request_api_doc
 @api_view(['POST'])
@@ -49,6 +51,7 @@ def send_request(request):
     to_email = receiver.email
     send_email(subject, plain_text_body, html_template_path, context, to_email)
     return Response({"message": "Request sent successfully", "data": serializer.data}, status=status.HTTP_201_CREATED)
+
 
 @accept_reject_api_doc
 @api_view(['POST'])
@@ -111,16 +114,42 @@ def withdraw_send_request(request):
 @api_view(['GET'])
 @is_auth
 def list_connection(request):
-    user_id = request.user_id
+    try:
+        user_id = request.user_id
+        connections_type = request.query_params.get('connections_type')
+        # if connections_type not in ['accepted', 'pending', 'blocked']:
+        #     return Response({"error": "Invalid connections_type parameter."}, status=status.HTTP_400_BAD_REQUEST)
+        if connections_type == 'blocked':
+            blocked_connections = BlockedUser.objects.filter(blocker_id=user_id)
+            blocked_serializer = BlockedUserSerializer(blocked_connections, many=True)
+            return Response({"blocked_connections": blocked_serializer.data}, status=status.HTTP_200_OK)
+        # connections = UserConnection.objects.filter(Q(sender_id=user_id) | Q(receiver_id=user_id))
 
-    connections = UserConnection.objects.filter(Q(sender_id=user_id) | Q(receiver_id=user_id))
+        if connections_type == 'accepted':
+            connections = UserConnection.objects.filter(sender_id=user_id)
+            print("line--->",connections)
+            connections = connections.filter(status=UserConnection.Status.APPROVED)
+            print("line--",connections )
+        elif connections_type == 'pending':
+            print("curr-id", user_id)
+            print("Line 131>>")
+            connections = UserConnection.objects.filter(receiver_id=user_id)
+            print("conn-->", connections)
+            connections = connections.filter(status=UserConnection.Status.PENDING)
+            print("Line 133>>", connections)
 
-    if not connections.exists():
-        return Response({"message": "No connection requests found"}, status=status.HTTP_404_NOT_FOUND)
-    serializer = UserConnectionSerializer(connections, many=True)
+        serializer = UserConnectionSerializer(connections, many=True)
 
-    return Response({"message": "Connection requests fetched successfully", "data": serializer.data},
-                    status=status.HTTP_200_OK)
+        if not connections.exists():
+            return Response({"message": f"No {connections_type} connection requests found."},
+                            status=status.HTTP_404_NOT_FOUND)
+
+        return Response({"data": serializer.data}, status=status.HTTP_200_OK)
+
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
 @block_user_api_doc
 @api_view(['POST'])
 @is_auth

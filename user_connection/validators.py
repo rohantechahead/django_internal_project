@@ -22,4 +22,3 @@ def verifying_accept_reject_request(request):
        return True
    else:
        return False
-
