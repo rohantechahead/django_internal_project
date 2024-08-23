@@ -222,10 +222,9 @@ def report_user(request):
 @is_auth
 def search_username(request):
     try:
-        user_id=request.user_id
-        search_username= request.data.get('username')
+        search_username= request.query_params.get('username')
 
-        users = User.objects.filter(username=search_username)
+        users = User.objects.filter(username__icontains=search_username)
         serializer = LoginSerializer(users, many=True)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
