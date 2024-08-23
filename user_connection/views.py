@@ -76,7 +76,7 @@ def handle_friend_request(request):
 
         connection.status = UserConnection.Status.APPROVED
 
-        subject = "Your Friend Request was Accepted!"
+        subject = "Your Friend Request is Accepted!"
         plain_text_body = f"Hi {sender.username}, your friend request to {receiver.username} was accepted!"
         html_template_path = "accept_request_email.html"  # Ensure this template exists
         context = {
