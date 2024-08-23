@@ -1061,7 +1061,6 @@ def UserWishAddapi_doc(func):
     return wrap
 
 
-
 def get_user_wish_api_doc(func):
     @swagger_auto_schema(
         method='get',
