@@ -16,5 +16,7 @@ class SuccessMessage:
     SEND_EMAIL_SUCCESS = "Email sent successfully"
 
     USER_WISH_SUCCESS = "User Wish created successfully"
+    USER_WISH_UPDATE_SUCCESS = "User wish updated successfully"
+    USER_WISH_DELETE_SUCCESS = "User deleted successfully"
 
 
