@@ -76,6 +76,7 @@ def user_login(request):
     user_data.update({
         "access_token": access_token,
         "refresh_token": refresh_token
+
     })
 
     user.refresh_token = str(refresh_token)

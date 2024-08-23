@@ -1,15 +1,13 @@
-from django.db.models import Q
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from User_Auth.models import User
-from utility.api_documantion_helper import send_request_api_doc, withdraw_send_request_api_doc, accept_reject_api_doc, \
-    block_user_api_doc, list_connection_api_doc
+from utility.api_documantion_helper import send_request_api_doc, withdraw_send_request_api_doc,accept_reject_api_doc,block_user_api_doc, report_user_api_doc, list_connection_api_doc
 from utility.authentication_helper import is_auth
 from utility.email_utils import send_email
-from .models import UserConnection, BlockedUser
-from .serializers import UserConnectionSerializer, BlockedUserSerializer
-from .validators import verifying_user_connection_request, verifying_accept_reject_request
+from .models import UserConnection, BlockedUser, ReportedUser
+from .serializers import UserConnectionSerializer, BlockedUserSerializer, ReportedUserSerializer
+from .validators import verifying_user_connection_request,verifying_accept_reject_request, verifying_user_report
 
 
 @send_request_api_doc
@@ -63,16 +61,31 @@ def handle_friend_request(request):
     action = request.data.get('action')
     user_id = request.user_id
 
-    connection = UserConnection.objects.filter(sender_id=sender_id,
-                                               receiver_id=user_id,
-                                               status=UserConnection.Status.PENDING).first()
+    connection = UserConnection.objects.filter(sender_id=sender_id,receiver_id=user_id,status=UserConnection.Status.PENDING).first()
+
 
     if not connection:
         return Response({"error": "Connection request not found."}, status=status.HTTP_404_NOT_FOUND)
 
+    sender = User.objects.get(id=sender_id)
+    receiver = User.objects.get(id=user_id)
+
     if action == 'accept':
 
         connection.status = UserConnection.Status.APPROVED
+
+        subject = "Your Friend Request is Accepted!"
+        plain_text_body = f"Hi {sender.username}, your friend request to {receiver.username} was accepted!"
+        html_template_path = "accept_request_email.html"  # Ensure this template exists
+        context = {
+            "recipient_name": sender.username,
+            "sender_name": receiver.username,
+            "connect_profile_link": "https://example.com/connect-profile"  # Replace with actual link
+        }
+        to_email = sender.email
+
+        # Assuming send_email is a function defined elsewhere in your codebase
+        send_email(subject, plain_text_body, html_template_path, context, to_email)
         connection.save()
 
         return Response({"status": "success", "message": "Connection request accepted. You are now connected."})
@@ -117,14 +130,10 @@ def list_connection(request):
     try:
         user_id = request.user_id
         connections_type = request.query_params.get('connections_type')
-        # if connections_type not in ['accepted', 'pending', 'blocked']:
-        #     return Response({"error": "Invalid connections_type parameter."}, status=status.HTTP_400_BAD_REQUEST)
         if connections_type == 'blocked':
             blocked_connections = BlockedUser.objects.filter(blocker_id=user_id)
             blocked_serializer = BlockedUserSerializer(blocked_connections, many=True)
             return Response({"blocked_connections": blocked_serializer.data}, status=status.HTTP_200_OK)
-        # connections = UserConnection.objects.filter(Q(sender_id=user_id) | Q(receiver_id=user_id))
-
         if connections_type == 'accepted':
             connections = UserConnection.objects.filter(sender_id=user_id)
             print("line--->",connections)
@@ -175,3 +184,34 @@ def block_user(request):
     serializer = BlockedUserSerializer(block_entry)
 
     return Response({"message": "User blocked successfully", "data": serializer.data}, status=status.HTTP_201_CREATED)
+
+
+@report_user_api_doc
+@api_view(['POST'])
+@is_auth
+def report_user(request):
+    if not verifying_user_report(request):
+        return Response({"message": "Report user not verified"}, status=status.HTTP_400_BAD_REQUEST)
+
+    user_id = request.user_id
+    reported_user_id = request.data.get('reported_user_id')
+    reason = request.data.get('reason')
+
+    try:
+        reported_user_id = int(reported_user_id)
+    except ValueError:
+        return Response({"error": "Reported user id must be a valid integer"}, status=status.HTTP_400_BAD_REQUEST)
+
+    reported_user = User.objects.filter(id=reported_user_id).first()
+    if not reported_user:
+        return Response({"error": "User does not exist"}, status=status.HTTP_404_NOT_FOUND)
+
+    # Check if the user has already reported
+    if ReportedUser.objects.filter(reporter_id=user_id, reported_id=reported_user_id).exists():
+        return Response({"error": "You have already reported this user"}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Create the report entry
+    report_entry = ReportedUser.objects.create(reporter_id_id=user_id, reported_id_id=reported_user_id, reason=reason)
+    serializer = ReportedUserSerializer(report_entry)
+
+    return Response({"message": "User reported successfully", "data": serializer.data}, status=status.HTTP_201_CREATED)
