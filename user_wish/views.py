@@ -1,8 +1,9 @@
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-
+from django.db.models import Q
 from User_Auth.models import User
+from user_connection.models import UserConnection
 from user_wish.models import UserWish
 from user_wish.serializers import UserWishSerializers
 from utility.api_documantion_helper import UserWishAddapi_doc, get_user_wish_api_doc,user_wish_update_api_doc
@@ -59,8 +60,6 @@ def user_wish_update(request, pk):
 
     updated_title = request.data.get("title")
     updated_description = request.data.get("description")
-
-
     user_wishes.title = updated_title
     user_wishes.description = updated_description
     user_wishes.save()
@@ -83,3 +82,30 @@ def user_wish_delete(request,pk):
     user_wishes.delete()
 
     return Response({"Message":"User deleted successfully"},status=status.HTTP_204_NO_CONTENT)
+
+@api_view(['GET'])
+@is_auth
+def get_profile_view(request):
+    user_id=request.user_id
+    connection_id = request.query_params.get("connection_id")
+
+    connection=UserConnection.objects.filter(sender_id=user_id,receiver_id=connection_id)
+    if not connection:
+        return Response({"error": "You are not friends with this user"}, status=status.HTTP_403_FORBIDDEN)
+
+    user = User.objects.get(id=connection_id)
+
+    if not user:
+        return Response({"Error":"User Not found"},status=status.HTTP_400_BAD_REQUEST)
+
+    profile_data = {
+        "username": user.username,
+        "first_name":user.first_name,
+        "last_name":user.last_name,
+        "email":user.email,
+    }
+
+    return Response({"message": "Friend's profile view successfully", "data": profile_data},
+                    status=status.HTTP_200_OK)
+
+
