@@ -1,3 +1,4 @@
+from django.db.models import Q
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -139,7 +140,8 @@ def list_connection(request):
             return Response({"blocked_connections": blocked_serializer.data}, status=status.HTTP_200_OK)
 
         elif connections_type == 'accepted':
-            connections = UserConnection.objects.filter(sender_id=user_id, status=UserConnection.Status.APPROVED)
+
+            connections = UserConnection.objects.filter(Q(sender_id=user_id) | Q(receiver_id=user_id), status=UserConnection.Status.APPROVED)
         elif connections_type == 'pending':
             connections = UserConnection.objects.filter(sender_id=user_id, status=UserConnection.Status.PENDING)
         else:
