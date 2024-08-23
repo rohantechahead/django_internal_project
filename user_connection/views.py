@@ -143,7 +143,7 @@ def list_connection(request):
 
             connections = UserConnection.objects.filter(Q(sender_id=user_id) | Q(receiver_id=user_id), status=UserConnection.Status.APPROVED)
         elif connections_type == 'pending':
-            connections = UserConnection.objects.filter(sender_id=user_id, status=UserConnection.Status.PENDING)
+            connections = UserConnection.objects.filter(receiver_id=user_id, status=UserConnection.Status.PENDING)
         else:
             return Response({"error": "Invalid connection type provided."}, status=status.HTTP_400_BAD_REQUEST)
 
