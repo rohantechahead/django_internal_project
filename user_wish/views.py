@@ -59,8 +59,7 @@ def user_wish_update(request, pk):
 
     updated_title = request.data.get("title")
     updated_description = request.data.get("description")
-    # if updated_title is None and updated_description is None:
-    #     return Response({"message": "No fields provided for update"}, status=status.HTTP_400_BAD_REQUEST)
+
 
     user_wishes.title = updated_title
     user_wishes.description = updated_description
@@ -74,9 +73,7 @@ def user_wish_update(request, pk):
 @api_view(['DELETE'])
 @is_auth
 def user_wish_delete(request,pk):
-    # if not verifying_request(request):
-    #     return Response({"Message": "User not verified"}, status=status.HTTP_400_BAD_REQUEST)
-
+   
     user_id = request.user_id
     try:
         user_wishes = UserWish.objects.get(userwish_id=user_id, pk=pk)
