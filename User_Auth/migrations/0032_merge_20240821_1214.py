@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('User_Auth', '0002_user_dob_user_first_name_user_gender_user_last_name_and_more'),
         ('User_Auth', '0029_merge_0017_alter_user_dob_0028_alter_user_dob'),

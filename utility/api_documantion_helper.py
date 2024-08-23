@@ -609,7 +609,8 @@ def send_request_api_doc(func):
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
             properties={
-                'receiver_id': openapi.Schema(type=openapi.TYPE_INTEGER, description='The receiver_id gives us the receivers user_id '),
+                'receiver_id': openapi.Schema(type=openapi.TYPE_INTEGER,
+                                              description='The receiver_id gives us the receivers user_id '),
             },
             required=['receiver_id']
         ),
@@ -679,7 +680,8 @@ def withdraw_send_request_api_doc(func):
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
             properties={
-                'receiver_id': openapi.Schema(type=openapi.TYPE_INTEGER,description='The receiver_id gives us the receivers user_id '),
+                'receiver_id': openapi.Schema(type=openapi.TYPE_INTEGER,
+                                              description='The receiver_id gives us the receivers user_id '),
             },
             required=['receiver_id']
         ),
@@ -733,6 +735,116 @@ def withdraw_send_request_api_doc(func):
                     }
                 }
             )
+        }
+    )
+    @wraps(func)
+    def wrap(request, *args, **kwargs):
+        return func(request, *args, **kwargs)
+
+    return wrap
+
+def block_user_api_doc(func):
+    @swagger_auto_schema(
+        method='post',
+        operation_description="Blocked user successfully.",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'blocked_user_id': openapi.Schema(type=openapi.TYPE_INTEGER,
+                                                  description='block user id for block the user'),
+            },
+            required=['blocked_user_id']
+        ),
+        manual_parameters=[
+            openapi.Parameter(
+                'Authorization',
+                openapi.IN_HEADER,
+                description="Bearer token",
+                type=openapi.TYPE_STRING,
+                required=True,
+            ),
+        ],
+        responses={
+            200: openapi.Response(
+                description='blocked user using blocked user id',
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'blocked_user_id': openapi.Schema(type=openapi.TYPE_INTEGER, description='New refresh token'),
+                    }
+                ),
+                examples={
+                    'application/json': {
+                        'message': 'blocked user successfully',
+                    }
+                }
+            ),
+            400: openapi.Response(
+                description='Invalid request body',
+                examples={
+                    'application/json': {
+                        'error': 'Invalid Request Body'
+                    }
+                }
+            ),
+            404: openapi.Response(
+                description='User not found',
+                examples={
+                    'application/json': {
+                        'error': 'User not found'
+                    }
+                }
+            )
+        }
+    )
+    @wraps(func)
+    def wrap(request, *args, **kwargs):
+        return func(request, *args, **kwargs)
+
+    return wrap
+
+def list_connection_api_doc(func):
+    @swagger_auto_schema(
+        method='get',
+        operation_description="Retrieve a list of user connection requests",
+        responses={
+            200: openapi.Response(
+                description="Connection requests fetched successfully",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'message': openapi.Schema(
+                            type=openapi.TYPE_STRING,
+                            description='Response message'
+                        ),
+                        'data': openapi.Schema(
+                            type=openapi.TYPE_ARRAY,
+                            items=openapi.Items(
+                                type=openapi.TYPE_OBJECT,
+                                properties={
+                                    'sender_id': openapi.Schema(
+                                        type=openapi.TYPE_INTEGER,
+                                        description='ID of the sender'
+                                    ),
+                                    'receiver_id': openapi.Schema(
+                                        type=openapi.TYPE_INTEGER,
+                                        description='ID of the receiver'
+                                    ),
+                                    'status': openapi.Schema(
+                                        type=openapi.TYPE_STRING,
+                                        description='Status of the connection'
+                                    ),
+                                }
+                            ),
+                            description='List of connection requests'
+                        ),
+                    },
+                    required=['message', 'data']
+                ),
+            ),
+            404: openapi.Response(
+                description="No connection requests found"
+            ),
         }
     )
     @wraps(func)
@@ -814,68 +926,6 @@ def accept_reject_api_doc(func):
             )
         }
     )
-    @wraps(func)
-    def wrap(request, *args, **kwargs):
-        return func(request, *args, **kwargs)
-
-    return wrap
-
-
-def block_user_api_doc(func):
-    @swagger_auto_schema(
-        method='post',
-        operation_description="Blocked user....",
-        request_body=openapi.Schema(
-            type=openapi.TYPE_OBJECT,
-            properties={
-                'blocked_user_id': openapi.Schema(type=openapi.TYPE_INTEGER,
-                                                  description='block user id for block the user'),
-            },
-            required=['blocked_user_id']
-        ),
-        manual_parameters=[
-            openapi.Parameter(
-                'Authorization',
-                openapi.IN_HEADER,
-                description="Bearer token",
-                type=openapi.TYPE_STRING,
-                required=True,
-            ),
-        ],
-        responses={
-            200: openapi.Response(
-                description='blocked user using blocked user id',
-                schema=openapi.Schema(
-                    type=openapi.TYPE_OBJECT,
-                    properties={
-                        'blocked_user_id': openapi.Schema(type=openapi.TYPE_INTEGER, description='Add to block for using their user id'),
-                    }
-                ),
-                examples={
-                    'application/json': {
-                        'message': 'blocked user successfully',
-                    }
-                }
-            ),
-            400: openapi.Response(
-                description='Invalid request body',
-                examples={
-                    'application/json': {
-                        'error': 'Invalid Request Body'
-                    }
-                }
-            ),
-            404: openapi.Response(
-                description='User not found',
-                examples={
-                    'application/json': {
-                        'error': 'User not found'
-                    }
-                }
-            )
-        }
-    )
-
     @wraps(func)
     def wrap(request, *args, **kwargs):
         return func(request, *args, **kwargs)
@@ -1009,5 +1059,3 @@ def UserWishAddapi_doc(func):
         return func(request, *args, **kwargs)
 
     return wrap
-
-

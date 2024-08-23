@@ -1,10 +1,9 @@
+from django.db.models import Q
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-
 from User_Auth.models import User
-from user_wish.validators import verifying_user_request
-from utility.api_documantion_helper import send_request_api_doc, withdraw_send_request_api_doc,accept_reject_api_doc,block_user_api_doc, report_user_api_doc
+from utility.api_documantion_helper import send_request_api_doc, withdraw_send_request_api_doc,accept_reject_api_doc,block_user_api_doc, report_user_api_doc, list_connection_api_doc
 from utility.authentication_helper import is_auth
 from utility.email_utils import send_email
 from .models import UserConnection, BlockedUser, ReportedUser
@@ -123,6 +122,41 @@ def withdraw_send_request(request):
     connection = UserConnection.objects.filter(sender_id=sender, receiver_id=receiver)
     connection.delete()
     return Response({"message": "Request Withdrawn successfully"}, status=status.HTTP_200_OK)
+
+
+@list_connection_api_doc
+@api_view(['GET'])
+@is_auth
+def list_connection(request):
+    try:
+        user_id = request.user_id
+        connections_type = request.query_params.get('connections_type')
+
+        if connections_type == 'blocked':
+            blocked_connections = BlockedUser.objects.filter(blocker_id=user_id)
+            if not blocked_connections.exists():
+                return Response({"message": "No blocked connections found."}, status=status.HTTP_404_NOT_FOUND)
+            blocked_serializer = BlockedUserSerializer(blocked_connections, many=True)
+            return Response({"blocked_connections": blocked_serializer.data}, status=status.HTTP_200_OK)
+
+        elif connections_type == 'accepted':
+
+            connections = UserConnection.objects.filter(Q(sender_id=user_id) | Q(receiver_id=user_id), status=UserConnection.Status.APPROVED)
+        elif connections_type == 'pending':
+            connections = UserConnection.objects.filter(receiver_id=user_id, status=UserConnection.Status.PENDING)
+        else:
+            return Response({"error": "Invalid connection type provided."}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not connections.exists():
+            return Response({"message": f"No {connections_type} connection requests found."},
+                            status=status.HTTP_404_NOT_FOUND)
+
+        serializer = UserConnectionSerializer(connections, many=True)
+        return Response({"data": serializer.data}, status=status.HTTP_200_OK)
+
+    except Exception as e:
+        # Consider logging the error
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @block_user_api_doc

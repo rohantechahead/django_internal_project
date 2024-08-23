@@ -11,11 +11,6 @@ class UserConnectionSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-    class Meta:
-        model = UserConnection
-        fields = "__all__"
-
-
 class BlockedUserSerializer(serializers.ModelSerializer):
     blocker_username = serializers.CharField(source='blocker_id.username', read_only=True)
     blocked_username = serializers.CharField(source='blocked_id.username', read_only=True)

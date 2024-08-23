@@ -23,7 +23,6 @@ def verifying_accept_reject_request(request):
    else:
        return False
 
-
 def verifying_user_report(request):
     schema = {
         'reported_user_id': {'type': 'integer', 'required': True},
@@ -34,5 +33,3 @@ def verifying_user_report(request):
         return True
     else:
         return False
-
-
