@@ -7,7 +7,7 @@ from user_wish.models import UserWish
 from user_wish.serializers import UserWishSerializers
 from utility.api_documantion_helper import UserWishAddapi_doc
 from utility.authentication_helper import is_auth
-from .validators import verifying_user_request
+from .validators import verifying_user_request, verifying_request
 
 
 # Create your views here.
@@ -42,9 +42,47 @@ def UserWishAdd(request):
 @api_view(['GET'])
 @is_auth
 def get_user_wish(request):
-    user_id=request.user_id
-    user_wish=UserWish.objects.filter(userwish_id=user_id)
-    serializer=UserWishSerializers(user_wish,many=True)
-    return Response(serializer.data,status=status.HTTP_200_OK)
+    user_id = request.user_id
+    user_wish = UserWish.objects.filter(userwish_id=user_id)
+    serializer = UserWishSerializers(user_wish, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+@api_view(['PUT'])
+@is_auth
+def user_wish_update(request, pk):
+    if not verifying_request(request):
+        return Response({"Message": "User not verified"}, status=status.HTTP_400_BAD_REQUEST)
+
+    user_id = request.user_id
+    user_wishes = UserWish.objects.get(userwish_id=user_id, pk=pk)
+
+    updated_title = request.data.get("title")
+    updated_description = request.data.get("description")
+    # if updated_title is None and updated_description is None:
+    #     return Response({"message": "No fields provided for update"}, status=status.HTTP_400_BAD_REQUEST)
+
+    user_wishes.title = updated_title
+    user_wishes.description = updated_description
+    user_wishes.save()
+
+    # Serialize the updated user_wishes
+    serializer = UserWishSerializers(user_wishes)
+    return Response({"message": "User wish updated successfully", "data": serializer.data}, status=status.HTTP_200_OK)
+
+
+@api_view(['DELETE'])
+@is_auth
+def user_wish_delete(request,pk):
+    # if not verifying_request(request):
+    #     return Response({"Message": "User not verified"}, status=status.HTTP_400_BAD_REQUEST)
+
+    user_id = request.user_id
+    try:
+        user_wishes = UserWish.objects.get(userwish_id=user_id, pk=pk)
+    except UserWish.DoesNotExist:
+        return Response({"message": "User wish not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    user_wishes.delete()
+
+    return Response({"Message":"User deleted successfully"},status=status.HTTP_204_NO_CONTENT)
