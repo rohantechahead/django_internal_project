@@ -38,6 +38,7 @@ def UserWishAdd(request):
     return Response({"message": "User Wish created successfully", "data": serializer.data},
                     status=status.HTTP_201_CREATED)
 
+
 @api_view(['GET'])
 @is_auth
 def get_user_wish(request):

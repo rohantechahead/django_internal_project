@@ -882,6 +882,7 @@ def block_user_api_doc(func):
 
     return wrap
 
+
 def report_user_api_doc(func):
     @swagger_auto_schema(
         method='post',
@@ -944,6 +945,7 @@ def report_user_api_doc(func):
         return func(request, *args, **kwargs)
 
     return wrap
+
 
 def UserWishAddapi_doc(func):
     @swagger_auto_schema(
