@@ -100,6 +100,9 @@ def get_profile_view(request):
     if not user:
         return Response({"Error":"User Not found"},status=status.HTTP_400_BAD_REQUEST)
 
+    wishes=UserWish.objects.get(tag_id=connection_id)
+    print("wishes",wishes)
+
     profile_data = {
         "username": user.username,
         "first_name":user.first_name,
