@@ -83,29 +83,6 @@ def user_wish_delete(request,pk):
 
     return Response({"Message":"User deleted successfully"},status=status.HTTP_204_NO_CONTENT)
 
-@api_view(['GET'])
-@is_auth
-def get_profile_view(request):
-    user_id=request.user_id
-    connection_id = request.query_params.get("connection_id")
 
-    connection=UserConnection.objects.filter(sender_id=user_id,receiver_id=connection_id)
-    if not connection:
-        return Response({"error": "You are not friends with this user"}, status=status.HTTP_403_FORBIDDEN)
-
-    user = User.objects.get(id=connection_id)
-
-    if not user:
-        return Response({"Error":"User Not found"},status=status.HTTP_400_BAD_REQUEST)
-
-    profile_data = {
-        "username": user.username,
-        "first_name":user.first_name,
-        "last_name":user.last_name,
-        "email":user.email,
-    }
-
-    return Response({"message": "Friend's profile view successfully", "data": profile_data},
-                    status=status.HTTP_200_OK)
 
 
