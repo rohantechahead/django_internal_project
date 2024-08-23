@@ -1,13 +1,14 @@
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-
+from django.db.models import Q
 from User_Auth.models import User
+from user_connection.models import UserConnection
 from user_wish.models import UserWish
 from user_wish.serializers import UserWishSerializers
-from utility.api_documantion_helper import UserWishAddapi_doc
+from utility.api_documantion_helper import UserWishAddapi_doc, get_user_wish_api_doc,user_wish_update_api_doc
 from utility.authentication_helper import is_auth
-from .validators import verifying_user_request
+from .validators import verifying_user_request, verifying_request
 
 
 # Create your views here.
@@ -38,15 +39,76 @@ def UserWishAdd(request):
     return Response({"message": "User Wish created successfully", "data": serializer.data},
                     status=status.HTTP_201_CREATED)
 
-
+@get_user_wish_api_doc
 @api_view(['GET'])
 @is_auth
 def get_user_wish(request):
-    user_id=request.user_id
-    user_wish=UserWish.objects.filter(userwish_id=user_id)
-    serializer=UserWishSerializers(user_wish,many=True)
-    return Response(serializer.data,status=status.HTTP_200_OK)
+    user_id = request.user_id
+    user_wish = UserWish.objects.filter(userwish_id=user_id)
+    serializer = UserWishSerializers(user_wish, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
+@user_wish_update_api_doc
+@api_view(['PUT'])
+@is_auth
+def user_wish_update(request, pk):
+    if not verifying_request(request):
+        return Response({"Message": "User not verified"}, status=status.HTTP_400_BAD_REQUEST)
+
+    user_id = request.user_id
+    user_wishes = UserWish.objects.get(userwish_id=user_id, pk=pk)
+
+    updated_title = request.data.get("title")
+    updated_description = request.data.get("description")
+    user_wishes.title = updated_title
+    user_wishes.description = updated_description
+    user_wishes.save()
+
+    # Serialize the updated user_wishes
+    serializer = UserWishSerializers(user_wishes)
+    return Response({"message": "User wish updated successfully", "data": serializer.data}, status=status.HTTP_200_OK)
+
+
+@api_view(['DELETE'])
+@is_auth
+def user_wish_delete(request,pk):
+
+    user_id = request.user_id
+    try:
+        user_wishes = UserWish.objects.get(userwish_id=user_id, pk=pk)
+    except UserWish.DoesNotExist:
+        return Response({"message": "User wish not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    user_wishes.delete()
+
+    return Response({"Message":"User deleted successfully"},status=status.HTTP_204_NO_CONTENT)
+
+
+
+@api_view(['GET'])
+@is_auth
+def get_profile_view(request):
+    user_id=request.user_id
+    connection_id = request.query_params.get("connection_id")
+
+    connection=UserConnection.objects.filter(sender_id=user_id,receiver_id=connection_id)
+    if not connection:
+        return Response({"error": "You are not friends with this user"}, status=status.HTTP_403_FORBIDDEN)
+
+    user = User.objects.get(id=connection_id)
+
+    if not user:
+        return Response({"Error":"User Not found"},status=status.HTTP_400_BAD_REQUEST)
+
+    profile_data = {
+        "username": user.username,
+        "first_name":user.first_name,
+        "last_name":user.last_name,
+        "email":user.email,
+    }
+
+    return Response({"message": "Friend's profile view successfully", "data": profile_data},
+                    status=status.HTTP_200_OK)
 
 
 
