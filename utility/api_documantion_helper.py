@@ -1059,3 +1059,107 @@ def UserWishAddapi_doc(func):
         return func(request, *args, **kwargs)
 
     return wrap
+
+
+
+def get_user_wish_api_doc(func):
+    @swagger_auto_schema(
+        method='get',
+        operation_description="User Wish get profile",
+        manual_parameters=[
+            openapi.Parameter(
+                'Authorization',
+                openapi.IN_HEADER,
+                description="Bearer token",
+                type=openapi.TYPE_STRING,
+                required=True,
+            ),
+        ],
+
+        responses={
+            200: openapi.Response(
+                description='User Wish profile',
+                examples={
+                    'application/json': {
+                        'Success': 'User Wish Profile '
+                    }
+                }
+            ),
+            400: openapi.Response(
+                description='Invalid request body',
+                examples={
+                    'application/json': {
+                        'Error': 'Invalid request body'
+                    }
+                }
+            )
+        }
+    )
+    @ wraps(func)
+    def wrap(request, *args, **kwargs):
+        return func(request, *args, **kwargs)
+    return wrap
+
+def user_wish_update_api_doc(func):
+    @swagger_auto_schema(
+        method='put',
+        operation_description="User Wish Updated successfully.",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'title': openapi.Schema(type=openapi.TYPE_STRING, description='It shows the special events'),
+                'description': openapi.Schema(type=openapi.TYPE_STRING, description='It shows the desire of the user'),
+            },
+            required=['title', 'description']
+        ),
+        manual_parameters=[
+            openapi.Parameter(
+                'Authorization',
+                openapi.IN_HEADER,
+                description="Bearer token",
+                type=openapi.TYPE_STRING,
+                required=True,
+            ),
+        ],
+        responses={
+            200: openapi.Response(
+                description='User wish updated Successfully',
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'title': openapi.Schema(type=openapi.TYPE_STRING, description='It shows the title of the user_wish '),
+                        'description': openapi.Schema(type=openapi.TYPE_STRING,description='It shows what he needs in this wish'),
+                    }
+                ),
+                examples={
+                    'application/json': {
+                        'message': 'User wish Updated succesfully',
+                    }
+                }
+            ),
+            400: openapi.Response(
+                description='Invalid request body',
+                examples={
+                    'application/json': {
+                        'error': 'Invalid Request Body'
+                    }
+                }
+            ),
+            404: openapi.Response(
+                description='User not found',
+                examples={
+                    'application/json': {
+                        'error': 'User not found'
+                    }
+                }
+            )
+        }
+    )
+    @wraps(func)
+    def wrap(request, *args, **kwargs):
+        return func(request, *args, **kwargs)
+
+    return wrap
+
+
+

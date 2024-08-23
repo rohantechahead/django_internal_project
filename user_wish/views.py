@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from User_Auth.models import User
 from user_wish.models import UserWish
 from user_wish.serializers import UserWishSerializers
-from utility.api_documantion_helper import UserWishAddapi_doc
+from utility.api_documantion_helper import UserWishAddapi_doc, get_user_wish_api_doc,user_wish_update_api_doc
 from utility.authentication_helper import is_auth
 from .validators import verifying_user_request, verifying_request
 
@@ -38,7 +38,7 @@ def UserWishAdd(request):
     return Response({"message": "User Wish created successfully", "data": serializer.data},
                     status=status.HTTP_201_CREATED)
 
-
+@get_user_wish_api_doc
 @api_view(['GET'])
 @is_auth
 def get_user_wish(request):
@@ -47,7 +47,7 @@ def get_user_wish(request):
     serializer = UserWishSerializers(user_wish, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
-
+@user_wish_update_api_doc
 @api_view(['PUT'])
 @is_auth
 def user_wish_update(request, pk):
@@ -73,7 +73,7 @@ def user_wish_update(request, pk):
 @api_view(['DELETE'])
 @is_auth
 def user_wish_delete(request,pk):
-   
+
     user_id = request.user_id
     try:
         user_wishes = UserWish.objects.get(userwish_id=user_id, pk=pk)
