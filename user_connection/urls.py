@@ -8,7 +8,7 @@ urlpatterns = [
     path('send-request/', send_request, name='send-request'),
     path('block-user/', block_user, name='block-user'),
     path('withdraw-request/', withdraw_send_request, name='withdraw-request'),
-    path('list_connection/', list_connection, name='list_connection'),
+    path('list-connection/', list_connection, name='list-connection'),
     path('report-user/',report_user,name='report_user')
 
 ]
