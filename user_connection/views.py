@@ -130,32 +130,30 @@ def list_connection(request):
     try:
         user_id = request.user_id
         connections_type = request.query_params.get('connections_type')
+
         if connections_type == 'blocked':
             blocked_connections = BlockedUser.objects.filter(blocker_id=user_id)
+            if not blocked_connections.exists():
+                return Response({"message": "No blocked connections found."}, status=status.HTTP_404_NOT_FOUND)
             blocked_serializer = BlockedUserSerializer(blocked_connections, many=True)
             return Response({"blocked_connections": blocked_serializer.data}, status=status.HTTP_200_OK)
-        if connections_type == 'accepted':
-            connections = UserConnection.objects.filter(sender_id=user_id)
-            print("line--->",connections)
-            connections = connections.filter(status=UserConnection.Status.APPROVED)
-            print("line--",connections )
-        elif connections_type == 'pending':
-            print("curr-id", user_id)
-            print("Line 131>>")
-            connections = UserConnection.objects.filter(receiver_id=user_id)
-            print("conn-->", connections)
-            connections = connections.filter(status=UserConnection.Status.PENDING)
-            print("Line 133>>", connections)
 
-        serializer = UserConnectionSerializer(connections, many=True)
+        elif connections_type == 'accepted':
+            connections = UserConnection.objects.filter(sender_id=user_id, status=UserConnection.Status.APPROVED)
+        elif connections_type == 'pending':
+            connections = UserConnection.objects.filter(sender_id=user_id, status=UserConnection.Status.PENDING)
+        else:
+            return Response({"error": "Invalid connection type provided."}, status=status.HTTP_400_BAD_REQUEST)
 
         if not connections.exists():
             return Response({"message": f"No {connections_type} connection requests found."},
                             status=status.HTTP_404_NOT_FOUND)
 
+        serializer = UserConnectionSerializer(connections, many=True)
         return Response({"data": serializer.data}, status=status.HTTP_200_OK)
 
     except Exception as e:
+        # Consider logging the error
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
