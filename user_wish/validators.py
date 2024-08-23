@@ -13,4 +13,15 @@ def verifying_user_request(request):
         print(v.errors)
         return False
 
+def verifying_request(request):
+    schema = {
+        'title': {'type': 'string', 'required': True},
+        'description': {'type': 'string', 'required': True}
+    }
+    v = Validator()
+    if v.validate(request.data, schema):
+        return True
+    else:
+        return False
+
 
