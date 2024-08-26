@@ -5,6 +5,7 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
+
 from User_Auth.serializer import LoginSerializer
 
 
@@ -1123,6 +1124,7 @@ def get_user_wish_api_doc(func):
         return func(request, *args, **kwargs)
     return wrap
 
+
 def user_wish_update_api_doc(func):
     @swagger_auto_schema(
         method='put',
@@ -1217,4 +1219,65 @@ def search_username_api_doc(func):
         return func(request, *args, **kwargs)
 
     return wrap
+
+
+from functools import wraps
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
+
+
+def get_profile_view_api_doc(func):
+    @swagger_auto_schema(
+        method='get',
+        operation_description="Get friend's profile view",
+        manual_parameters=[
+            openapi.Parameter(
+                'Authorization',
+                openapi.IN_HEADER,
+                description="Bearer token",
+                type=openapi.TYPE_STRING,
+                required=True,
+            ),
+            openapi.Parameter(
+                'connection_id',
+                openapi.IN_QUERY,
+                description="ID of the connection (friend)",
+                type=openapi.TYPE_STRING,
+                required=True,
+            ),
+        ],
+        responses={
+            200: openapi.Response(
+                description='Friend\'s profile retrieved successfully',
+                examples={
+                    'application/json': {
+                        'data': {
+                        }
+                    }
+                }
+            ),
+            400: openapi.Response(
+                description='User Not Found',
+                examples={
+                    'application/json': {
+                        'error': 'User Not Found'
+                    }
+                }
+            ),
+            403: openapi.Response(
+                description='You are not friends with this user',
+                examples={
+                    'application/json': {
+                        'error': 'You are not friends with this user'
+                    }
+                }
+            ),
+        }
+    )
+    @wraps(func)
+    def wrap(request, *args, **kwargs):
+        return func(request, *args, **kwargs)
+
+    return wrap
+
 
