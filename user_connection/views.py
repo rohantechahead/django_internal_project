@@ -3,13 +3,15 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from User_Auth.models import User
-from utility.api_documantion_helper import send_request_api_doc, withdraw_send_request_api_doc,accept_reject_api_doc,block_user_api_doc, report_user_api_doc, list_connection_api_doc
+from User_Auth.serializer import LoginSerializer
+from utility.api_documantion_helper import send_request_api_doc, withdraw_send_request_api_doc, accept_reject_api_doc, \
+    block_user_api_doc, report_user_api_doc, list_connection_api_doc, search_username_api_doc
 from utility.authentication_helper import is_auth
 from utility.email_utils import send_email
 from .models import UserConnection, BlockedUser, ReportedUser
 from .serializers import UserConnectionSerializer, BlockedUserSerializer, ReportedUserSerializer
 from .validators import verifying_user_connection_request,verifying_accept_reject_request, verifying_user_report
-
+from utility.common_message import CommonMessage
 
 @send_request_api_doc
 @api_view(['POST'])
@@ -49,7 +51,7 @@ def send_request(request):
     }
     to_email = receiver.email
     send_email(subject, plain_text_body, html_template_path, context, to_email)
-    return Response({"message": "Request sent successfully", "data": serializer.data}, status=status.HTTP_201_CREATED)
+    return Response({"message": CommonMessage.SEND_REQUEST_SUCCESS, "data": serializer.data}, status=status.HTTP_201_CREATED)
 
 
 @accept_reject_api_doc
@@ -89,12 +91,12 @@ def handle_friend_request(request):
         send_email(subject, plain_text_body, html_template_path, context, to_email)
         connection.save()
 
-        return Response({"status": "success", "message": "Connection request accepted. You are now connected."})
+        return Response({"status": "success", "message": CommonMessage.ACCEPT_REQUEST_SUCCESS})
 
     elif action == 'reject':
         connection.delete()
 
-        return Response({"status": "success", "message": "Connection request rejected."})
+        return Response({"status": "success", "message":  CommonMessage.REJECT_REQUEST_SUCCESS})
 
 
 @withdraw_send_request_api_doc
@@ -121,7 +123,7 @@ def withdraw_send_request(request):
 
     connection = UserConnection.objects.filter(sender_id=sender, receiver_id=receiver)
     connection.delete()
-    return Response({"message": "Request Withdrawn successfully"}, status=status.HTTP_200_OK)
+    return Response({"message": CommonMessage.WITHDRAW_REQUEST_SUCCESS}, status=status.HTTP_200_OK)
 
 
 @list_connection_api_doc
@@ -183,7 +185,7 @@ def block_user(request):
     block_entry = BlockedUser.objects.create(blocker_id_id=user_id, blocked_id_id=blocked_user_id)
     serializer = BlockedUserSerializer(block_entry)
 
-    return Response({"message": "User blocked successfully", "data": serializer.data}, status=status.HTTP_201_CREATED)
+    return Response({"message": CommonMessage.BLOCK_USER_SUCCESS, "data": serializer.data}, status=status.HTTP_201_CREATED)
 
 
 @report_user_api_doc
@@ -214,4 +216,24 @@ def report_user(request):
     report_entry = ReportedUser.objects.create(reporter_id_id=user_id, reported_id_id=reported_user_id, reason=reason)
     serializer = ReportedUserSerializer(report_entry)
 
-    return Response({"message": "User reported successfully", "data": serializer.data}, status=status.HTTP_201_CREATED)
+    return Response({"message": CommonMessage.REPORT_USER_SUCCESS, "data": serializer.data},
+                    status=status.HTTP_201_CREATED)
+
+@search_username_api_doc
+@api_view(['GET'])
+@is_auth
+def search_username(request):
+    try:
+        search_username= request.query_params.get('username')
+
+        users = User.objects.filter(username__icontains=search_username)
+        serializer = LoginSerializer(users, many=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+
+

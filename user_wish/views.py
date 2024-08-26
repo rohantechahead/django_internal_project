@@ -9,7 +9,7 @@ from user_wish.serializers import UserWishSerializers
 from utility.api_documantion_helper import UserWishAddapi_doc, get_user_wish_api_doc,user_wish_update_api_doc
 from utility.authentication_helper import is_auth
 from .validators import verifying_user_request, verifying_request
-
+from utility.common_message import CommonMessage
 
 # Create your views here.
 
@@ -36,7 +36,7 @@ def UserWishAdd(request):
 
     connection = UserWish.objects.create(userwish_id=user, title=title, description=description, tag_id=tag)
     serializer = UserWishSerializers(connection)
-    return Response({"message": "User Wish created successfully", "data": serializer.data},
+    return Response({"message": CommonMessage.USER_WISH_SUCCESS, "data": serializer.data},
                     status=status.HTTP_201_CREATED)
 
 @get_user_wish_api_doc
@@ -66,7 +66,7 @@ def user_wish_update(request, pk):
 
     # Serialize the updated user_wishes
     serializer = UserWishSerializers(user_wishes)
-    return Response({"message": "User wish updated successfully", "data": serializer.data}, status=status.HTTP_200_OK)
+    return Response({"message": CommonMessage.USER_WISH_UPDATE_SUCCESS, "data": serializer.data}, status=status.HTTP_200_OK)
 
 
 @api_view(['DELETE'])
@@ -80,6 +80,7 @@ def user_wish_delete(request,pk):
         return Response({"message": "User wish not found"}, status=status.HTTP_404_NOT_FOUND)
 
     user_wishes.delete()
+
 
     return Response({"Message":"User deleted successfully"},status=status.HTTP_204_NO_CONTENT)
 
@@ -116,4 +117,7 @@ def get_profile_view(request):
 
 
 
+
+
+    # return Response({"Message": CommonMessage.USER_WISH_DELETE_SUCCESS},status=status.HTTP_204_NO_CONTENT)
 
