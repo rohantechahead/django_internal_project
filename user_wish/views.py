@@ -9,7 +9,7 @@ from user_wish.serializers import UserWishSerializers
 from utility.api_documantion_helper import UserWishAddapi_doc, get_user_wish_api_doc,user_wish_update_api_doc
 from utility.authentication_helper import is_auth
 from .validators import verifying_user_request, verifying_request
-from utility.common_message import CommonMessage
+
 
 # Create your views here.
 
@@ -36,8 +36,8 @@ def UserWishAdd(request):
 
     connection = UserWish.objects.create(userwish_id=user, title=title, description=description, tag_id=tag)
     serializer = UserWishSerializers(connection)
-    return Response({"message": CommonMessage.USER_WISH_SUCCESS, "data": serializer.data},
-                    status=status.HTTP_201_CREATED)
+    # return Response({"message": CommonMessage.USER_WISH_SUCCESS, "data": serializer.data},
+    #                 status=status.HTTP_201_CREATED)
 
 @get_user_wish_api_doc
 @api_view(['GET'])
@@ -66,7 +66,7 @@ def user_wish_update(request, pk):
 
     # Serialize the updated user_wishes
     serializer = UserWishSerializers(user_wishes)
-    return Response({"message": CommonMessage.USER_WISH_UPDATE_SUCCESS, "data": serializer.data}, status=status.HTTP_200_OK)
+    # return Response({"message": CommonMessage.USER_WISH_UPDATE_SUCCESS, "data": serializer.data}, status=status.HTTP_200_OK)
 
 
 @api_view(['DELETE'])
@@ -85,34 +85,6 @@ def user_wish_delete(request,pk):
     return Response({"Message":"User deleted successfully"},status=status.HTTP_204_NO_CONTENT)
 
 
-
-@api_view(['GET'])
-@is_auth
-def get_profile_view(request):
-    user_id=request.user_id
-    connection_id = request.query_params.get("connection_id")
-
-    connection=UserConnection.objects.filter(sender_id=user_id,receiver_id=connection_id)
-    if not connection:
-        return Response({"error": "You are not friends with this user"}, status=status.HTTP_403_FORBIDDEN)
-
-    user = User.objects.get(id=connection_id)
-
-    if not user:
-        return Response({"Error":"User Not found"},status=status.HTTP_400_BAD_REQUEST)
-
-    wishes=UserWish.objects.get(tag_id=connection_id)
-    print("wishes",wishes)
-
-    profile_data = {
-        "username": user.username,
-        "first_name":user.first_name,
-        "last_name":user.last_name,
-        "email":user.email,
-    }
-
-    return Response({"message": "Friend's profile view successfully", "data": profile_data},
-                    status=status.HTTP_200_OK)
 
 
 
