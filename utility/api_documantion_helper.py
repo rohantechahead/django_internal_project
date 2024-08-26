@@ -5,6 +5,8 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
+from User_Auth.serializer import LoginSerializer
+
 
 def signup_api_doc(func):
     @swagger_auto_schema(
@@ -803,20 +805,33 @@ def block_user_api_doc(func):
 
     return wrap
 
+
 def list_connection_api_doc(func):
     @swagger_auto_schema(
         method='get',
-        operation_description="Retrieve a list of user connection requests",
+        operation_description="Retrieve a list of user connections based on the specified connection type",
+        manual_parameters=[
+            openapi.Parameter(
+                'connections_type',
+                openapi.IN_QUERY,
+                description="Type of connections to retrieve (blocked, accepted, pending)",
+                type=openapi.TYPE_STRING,
+                required=True
+            ),
+            openapi.Parameter(
+                'Authorization',
+                openapi.IN_HEADER,
+                description="list connection Token for authorization (e.g., Bearer <token>)",
+                type=openapi.TYPE_STRING,
+                required=True
+            )
+        ],
         responses={
             200: openapi.Response(
                 description="Connection requests fetched successfully",
                 schema=openapi.Schema(
                     type=openapi.TYPE_OBJECT,
                     properties={
-                        'message': openapi.Schema(
-                            type=openapi.TYPE_STRING,
-                            description='Response message'
-                        ),
                         'data': openapi.Schema(
                             type=openapi.TYPE_ARRAY,
                             items=openapi.Items(
@@ -839,19 +854,27 @@ def list_connection_api_doc(func):
                             description='List of connection requests'
                         ),
                     },
-                    required=['message', 'data']
+                    required=['data']
                 ),
             ),
             404: openapi.Response(
                 description="No connection requests found"
             ),
-        }
+            400: openapi.Response(
+                description="Invalid connection type provided"
+            ),
+            500: openapi.Response(
+                description="Internal server error"
+            ),
+        },
+        security=[{'Bearer': []}]
     )
     @wraps(func)
     def wrap(request, *args, **kwargs):
         return func(request, *args, **kwargs)
 
     return wrap
+
 
 
 def accept_reject_api_doc(func):
@@ -1161,5 +1184,37 @@ def user_wish_update_api_doc(func):
 
     return wrap
 
+def search_username_api_doc(func):
+    @swagger_auto_schema(
+        method='get',
+        manual_parameters=[
+            openapi.Parameter(
+                'username',
+                openapi.IN_QUERY,
+                description="Partial or full username to search for. The API returns users whose usernames contain this value.",
+                type=openapi.TYPE_STRING,
+                required=False,
+            ),
+        ],
+        responses={
+            200: openapi.Response(
+                description="A list of users matching the search criteria",
+                schema=LoginSerializer(many=True)
+            ),
+            500: openapi.Response(
+                description="Internal server error",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'error': openapi.Schema(type=openapi.TYPE_STRING)
+                    }
+                )
+            ),
+        }
+    )
+    @wraps(func)
+    def wrap(request, *args, **kwargs):
+        return func(request, *args, **kwargs)
 
+    return wrap
 
