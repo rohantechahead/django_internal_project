@@ -16,7 +16,7 @@ from .serializer import LoginSerializer, UserProfileSerializer
 from .validator import verifying_user_login, verifying_signup_request, verifying_forgotpassword_request, \
     verifying_refresh_token
 
-from utility.common_message import SuccessMessage
+from utility.common_message import CommonMessage
 
 
 
@@ -54,7 +54,7 @@ def signup_api(request):
     user_security_q = UsersecurityQuestion(user_id=user, security_q=security_q, security_a=security_a)
     user_security_q.save()
 
-    return Response({"Success": SuccessMessage.SIGNUP_REQUEST_SUCCESS}, status=status.HTTP_200_OK)
+    return Response({"Success": CommonMessage.SIGNUP_REQUEST_SUCCESS}, status=status.HTTP_200_OK)
 
 
 @login_api_doc
@@ -115,7 +115,7 @@ def forgot_password_api(request):
     user.set_password(new_password)
     user.save()
 
-    return Response({'success': True, 'message': SuccessMessage.PASSWORD_RESET_SUCCESS}, status=status.HTTP_200_OK)
+    return Response({'success': True, 'message': CommonMessage.PASSWORD_RESET_SUCCESS}, status=status.HTTP_200_OK)
 
 
 @update_security_api_doc
@@ -140,7 +140,7 @@ def update_security_q_a(request):
         user_security_q.security_a = make_password(security_a)
         user_security_q.save()
 
-        return Response({'success': True, 'message': SuccessMessage.UPDATE_SECURITY_Q_A},
+        return Response({'success': True, 'message': CommonMessage.UPDATE_SECURITY_Q_A},
                         status=status.HTTP_200_OK)
     except UsersecurityQuestion.DoesNotExist:
         return Response({'error': 'Security question not found'}, status=status.HTTP_404_NOT_FOUND)
@@ -197,7 +197,7 @@ def update_profile(request):
     user.phone_no = request.data.get('phone_no')
     user.save()
 
-    return Response({"Success": SuccessMessage.UPDATE_PROFILE_SUCCESS}, status=status.HTTP_200_OK)
+    return Response({"Success": CommonMessage.UPDATE_PROFILE_SUCCESS}, status=status.HTTP_200_OK)
 
 
 @logout_api_doc
@@ -216,7 +216,7 @@ def user_logout(request):
         user.is_login = False
         # Save the updated user instance to the database
         user.save()
-        return Response({'success': True, 'message': SuccessMessage.USER_LOGOUT_SUCCESS }, status=status.HTTP_200_OK)
+        return Response({'success': True, 'message': CommonMessage.USER_LOGOUT_SUCCESS }, status=status.HTTP_200_OK)
 
     except User.DoesNotExist:
         return Response({'success': False, 'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
@@ -257,7 +257,7 @@ def user_delete(request):
         user_id = request.user_id
         user = User.objects.get(id=user_id)
         user.delete()
-        return Response({'success': True, 'message': SuccessMessage.USER_DELETE_SUCCESS}, status=status.HTTP_200_OK)
+        return Response({'success': True, 'message': CommonMessage.USER_DELETE_SUCCESS}, status=status.HTTP_200_OK)
     except User.DoesNotExist:
         return Response({'success': False, 'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
@@ -292,4 +292,4 @@ def send_test_email(request):
     }
     to_email = "afzal@yopmail.com"
     send_email(subject, plain_text_body, html_template_path, context, to_email)
-    return Response({"Success": SuccessMessage.SEND_EMAIL_SUCCESS}, status=status.HTTP_200_OK)
+    return Response({"Success": CommonMessage.SEND_EMAIL_SUCCESS}, status=status.HTTP_200_OK)

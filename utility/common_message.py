@@ -1,4 +1,4 @@
-class SuccessMessage:
+class CommonMessage:
     SEND_REQUEST_SUCCESS = "Request sent successfully"
     ACCEPT_REQUEST_SUCCESS = "Connection request accepted. You are now connected."
     REJECT_REQUEST_SUCCESS = "Connection request rejected."
