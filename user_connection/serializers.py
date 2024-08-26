@@ -1,4 +1,7 @@
 from rest_framework import serializers
+
+from User_Auth.models import User
+from user_wish.serializers import UserWishSerializers
 from .models import UserConnection, BlockedUser, ReportedUser
 
 
@@ -9,6 +12,14 @@ class UserConnectionSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserConnection
         fields = "__all__"
+
+
+class ProfileConnectionSerializer(serializers.ModelSerializer):
+    user_wishes = UserWishSerializers(many=True)
+
+    class Meta:
+        model = User
+        fields = ['id','username', 'first_name', 'last_name', 'gender', 'dob', 'phone_no', 'user_wishes']
 
 
 class BlockedUserSerializer(serializers.ModelSerializer):
@@ -26,4 +37,4 @@ class ReportedUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ReportedUser
-        fields =   "__all__"
+        fields = "__all__"
