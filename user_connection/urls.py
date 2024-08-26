@@ -11,6 +11,6 @@ urlpatterns = [
     path('withdraw-request/', withdraw_send_request, name='withdraw-request'),
     path('list-connection/', list_connection, name='list-connection'),
     path('report-user/', report_user,name='report_user'),
-    path('search/', search_username,name='search')
+    path('global-search/', search_username,name='global-search')
 
 ]
