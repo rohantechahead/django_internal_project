@@ -4,7 +4,8 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from User_Auth.models import User
 from User_Auth.serializer import LoginSerializer
-from utility.api_documantion_helper import send_request_api_doc, withdraw_send_request_api_doc,accept_reject_api_doc,block_user_api_doc, report_user_api_doc, list_connection_api_doc
+from utility.api_documantion_helper import send_request_api_doc, withdraw_send_request_api_doc, accept_reject_api_doc, \
+    block_user_api_doc, report_user_api_doc, list_connection_api_doc, search_username_api_doc
 from utility.authentication_helper import is_auth
 from utility.email_utils import send_email
 from .models import UserConnection, BlockedUser, ReportedUser
@@ -218,7 +219,7 @@ def report_user(request):
     return Response({"message": CommonMessage.REPORT_USER_SUCCESS, "data": serializer.data},
                     status=status.HTTP_201_CREATED)
 
-
+@search_username_api_doc
 @api_view(['GET'])
 @is_auth
 def search_username(request):
