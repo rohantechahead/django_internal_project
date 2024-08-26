@@ -227,7 +227,6 @@ def report_user(request):
 def search_username(request):
     try:
         search_username= request.query_params.get('username')
-
         users = User.objects.filter(username__icontains=search_username)
         serializer = LoginSerializer(users, many=True)
 

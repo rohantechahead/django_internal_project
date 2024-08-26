@@ -1,6 +1,6 @@
 from django.contrib.auth.hashers import make_password
 from django.db.models import Q
-from rest_framework import status
+from rest_framework import status, generics
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
@@ -12,12 +12,11 @@ from utility.authentication_helper import generate_refresh_token, generate_acces
 
 from utility.email_utils import send_email
 from .models import User, UsersecurityQuestion
-from .serializer import LoginSerializer, UserProfileSerializer
+from .serializer import LoginSerializer, UserProfileSerializer, UserSerializer
 from .validator import verifying_user_login, verifying_signup_request, verifying_forgotpassword_request, \
     verifying_refresh_token
 
 from utility.common_message import CommonMessage
-
 
 
 @signup_api_doc
@@ -72,6 +71,8 @@ def user_login(request):
         return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
     if not user.check_password(password):
         return Response({'error': 'Incorrect password'}, status=status.HTTP_401_UNAUTHORIZED)
+    if user.is_block:
+        return Response({"message": "User is blocked"}, status=status.HTTP_403_FORBIDDEN)
     access_token = generate_access_token(user)
     refresh_token = generate_refresh_token(user)
 
@@ -81,7 +82,6 @@ def user_login(request):
         "refresh_token": refresh_token
 
     })
-
     user.refresh_token = str(refresh_token)
     user.is_login = True
 
@@ -152,7 +152,6 @@ def update_security_q_a(request):
 def get_security_q_a(request):
     user_id = request.user_id
 
-
     try:
         user = User.objects.get(id=user_id)
     except User.DoesNotExist:
@@ -216,7 +215,7 @@ def user_logout(request):
         user.is_login = False
         # Save the updated user instance to the database
         user.save()
-        return Response({'success': True, 'message': CommonMessage.USER_LOGOUT_SUCCESS }, status=status.HTTP_200_OK)
+        return Response({'success': True, 'message': CommonMessage.USER_LOGOUT_SUCCESS}, status=status.HTTP_200_OK)
 
     except User.DoesNotExist:
         return Response({'success': False, 'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
@@ -292,4 +291,10 @@ def send_test_email(request):
     }
     to_email = "afzal@yopmail.com"
     send_email(subject, plain_text_body, html_template_path, context, to_email)
+
     return Response({"Success": CommonMessage.SEND_EMAIL_SUCCESS}, status=status.HTTP_200_OK)
+
+    return Response({"Success": "Email sent successfully"}, status=status.HTTP_200_OK)
+
+
+

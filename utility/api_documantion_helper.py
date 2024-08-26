@@ -1220,12 +1220,6 @@ def search_username_api_doc(func):
 
     return wrap
 
-
-from functools import wraps
-from drf_yasg.utils import swagger_auto_schema
-from drf_yasg import openapi
-
-
 def get_profile_view_api_doc(func):
     @swagger_auto_schema(
         method='get',
