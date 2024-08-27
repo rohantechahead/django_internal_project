@@ -64,15 +64,15 @@ def user_login(request):
     username_or_email = request.data.get('username')
     password = request.data.get('password')
     if not username_or_email or not password:
-        return Response({'error': 'Username and password are required'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'error': CommonMessage.REQUIRED_UNAME_PASSWORD}, status=status.HTTP_400_BAD_REQUEST)
     try:
         user = User.objects.get(Q(username=username_or_email) | Q(email=username_or_email))
     except User.DoesNotExist:
-        return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+        return Response({'error':CommonMessage.INVALID_CREDENTIAL }, status=status.HTTP_401_UNAUTHORIZED)
     if not user.check_password(password):
-        return Response({'error': 'Incorrect password'}, status=status.HTTP_401_UNAUTHORIZED)
+        return Response({'error': CommonMessage.INCORRECT_PASS}, status=status.HTTP_401_UNAUTHORIZED)
     if user.is_block:
-        return Response({"message": "User is blocked"}, status=status.HTTP_403_FORBIDDEN)
+        return Response({"message": CommonMessage.ADMIN_BLOCK_USER}, status=status.HTTP_403_FORBIDDEN)
     access_token = generate_access_token(user)
     refresh_token = generate_refresh_token(user)
 
@@ -294,7 +294,7 @@ def send_test_email(request):
 
     return Response({"Success": CommonMessage.SEND_EMAIL_SUCCESS}, status=status.HTTP_200_OK)
 
-    return Response({"Success": "Email sent successfully"}, status=status.HTTP_200_OK)
+
 
 
 

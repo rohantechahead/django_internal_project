@@ -1,5 +1,5 @@
 from django.contrib import admin
-from User_Auth.models import User
+from User_Auth.models import User, UsersecurityQuestion
 from utility.email_utils import send_email
 
 
@@ -37,3 +37,4 @@ class UserAdmin(admin.ModelAdmin):
     search_fields = ('username', 'email', 'first_name', 'last_name')
 
 admin.site.register(User, UserAdmin)
+admin.site.register(UsersecurityQuestion)

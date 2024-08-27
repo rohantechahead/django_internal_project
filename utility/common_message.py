@@ -5,7 +5,12 @@ class CommonMessage:
     WITHDRAW_REQUEST_SUCCESS = "Request withdrawn successfully"
     BLOCK_USER_SUCCESS = "User blocked successfully"
     REPORT_USER_SUCCESS = "User reported successfully"
-    LIST_CONNECTION_SECCUSS = "requests found."
+    LIST_CONNECTION_SUCCESS = "requests found."
+    ADMIN_BLOCK_USER="User is blocked by admin"
+    INCORRECT_PASS="Password is Incorrect"
+    REQUIRED_UNAME_PASSWORD="Username and password are required"
+    INVALID_CREDENTIAL="Invalid credentials"
+
 
     SIGNUP_REQUEST_SUCCESS = "New User Created Successfully"
     PASSWORD_RESET_SUCCESS = 'Password reset successfully'

@@ -111,7 +111,6 @@ def is_auth(fun):
             request.decoded_token_result = decode_token_result
             request.user_id = request.decoded_token_result.get("user_id")
             user = User.objects.get(id=request.user_id)
-            print("block-->",user.is_block)
             if user.is_block:
                 return JsonResponse({"message": "User is blocked"}, status=status.HTTP_403_FORBIDDEN)
 

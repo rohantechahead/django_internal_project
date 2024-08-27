@@ -22,16 +22,11 @@ from rest_framework import permissions
 
 from .views import index
 
-<<<<<<< Updated upstream
-from .views import index
+
 
 from intern_network.views import index
 
 
-=======
-from intern_network.views import index
-
->>>>>>> Stashed changes
 schema_view = get_schema_view(
     openapi.Info(
         title="My API",

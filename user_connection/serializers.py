@@ -15,7 +15,7 @@ class UserConnectionSerializer(serializers.ModelSerializer):
 
 
 
-<<<<<<< Updated upstream
+
 class ProfileConnectionSerializer(serializers.ModelSerializer):
     user_wishes = UserWishSerializers(many=True)
 
@@ -24,8 +24,7 @@ class ProfileConnectionSerializer(serializers.ModelSerializer):
         fields = ['id','username', 'first_name', 'last_name', 'gender', 'dob', 'phone_no', 'user_wishes']
 
 
-=======
->>>>>>> Stashed changes
+
 
 class BlockedUserSerializer(serializers.ModelSerializer):
     blocker_username = serializers.CharField(source='blocker_id.username', read_only=True)
@@ -43,17 +42,6 @@ class ReportedUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ReportedUser
-<<<<<<< Updated upstream
-
         fields = "__all__"
 
-
-
-
-=======
-        fields ="__all__"
-
-    # def get_report_count(self, obj):
-    #     return ReportedUser.objects.filter(reported_user=obj).count()
->>>>>>> Stashed changes
 
