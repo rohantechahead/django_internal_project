@@ -136,25 +136,33 @@ def list_connection(request):
         user_id = request.user_id
         connections_type = request.query_params.get('connections_type')
 
+        # record = 10
+
+        page = int(request.query_params.get('page', 1))
+        page_size = int(request.query_params.get('page_size', 10))
+
         if connections_type == 'blocked':
             blocked_connections = BlockedUser.objects.filter(blocker_id=user_id)
             if not blocked_connections.exists():
                 return Response({"message": "No blocked connections found."}, status=status.HTTP_404_NOT_FOUND)
-            blocked_serializer = BlockedUserSerializer(blocked_connections, many=True)
-            return Response({"blocked_connections": blocked_serializer.data}, status=status.HTTP_200_OK)
+
+            total_count = blocked_connections.count()
+            start = (page - 1) * page_size
+            end = start + page_size
+            blocked_connections_paginated = blocked_connections[start:end]
+
+            blocked_serializer = BlockedUserSerializer(blocked_connections_paginated, many=True)
+            response_data = {
+                "count": total_count,
+                "blocked_connections": blocked_serializer.data,
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
 
         elif connections_type == 'accepted':
-            connections = UserConnection.objects.filter( Q(sender_id=user_id) | Q(receiver_id=user_id),status=UserConnection.Status.APPROVED)
-        elif connections_type == 'pending':
-            connections = UserConnection.objects.filter(receiver_id=user_id,status=UserConnection.Status.PENDING)
-        elif 'friend_id' in request.query_params:
-            user_id = request.query_params.get('friend_id')
-            friends = UserConnection.objects.filter(Q(sender_id=user_id) | Q(receiver_id=user_id),status=UserConnection.Status.APPROVED)
-            if not friends.exists():
-                return Response({"message": "No friends found."}, status=status.HTTP_404_NOT_FOUND)
-            friends_serializer = UserConnectionSerializer(friends, many=True)
-            return Response({"friends": friends_serializer.data}, status=status.HTTP_200_OK)
 
+            connections = UserConnection.objects.filter(Q(sender_id=user_id) | Q(receiver_id=user_id), status=UserConnection.Status.APPROVED)
+        elif connections_type == 'pending':
+            connections = UserConnection.objects.filter(receiver_id=user_id, status=UserConnection.Status.PENDING)
         else:
             return Response({"error": "Invalid connection type provided."}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -162,10 +170,23 @@ def list_connection(request):
             return Response({"message": f"No {connections_type} connection requests found."},
                             status=status.HTTP_404_NOT_FOUND)
 
-        serializer = UserConnectionSerializer(connections, many=True)
-        return Response({"data": serializer.data}, status=status.HTTP_200_OK)
+        total_count = connections.count()
+        print("total_count",total_count)
+        start = (page - 1) * page_size
+        end = start + page_size
+        connections_paginated = connections[start:end]
+        print("connection", connections_paginated)
+
+
+        serializer = UserConnectionSerializer(connections_paginated, many=True)
+        response_data = {
+            "count": total_count,
+            "data": serializer.data,
+        }
+        return Response(response_data, status=status.HTTP_200_OK)
 
     except Exception as e:
+        # Consider logging the error
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @block_user_api_doc
