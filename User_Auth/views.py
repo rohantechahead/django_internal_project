@@ -281,6 +281,7 @@ def get_refresh_token(request):
 
 @api_view(['POST'])
 def send_test_email(request):
+    receiver_email = request.data.get('receiver_email')
     subject = "New Friend Request"
     plain_text_body = "You have received a new friend request."
     html_template_path = "friend_request_email.html"  # Updated path
@@ -289,7 +290,7 @@ def send_test_email(request):
         "sender_name": "Jane Smith",
         "accept_request_link": "https://example.com/accept-request"
     }
-    to_email = "afzal@yopmail.com"
+    to_email = receiver_email
     send_email(subject, plain_text_body, html_template_path, context, to_email)
 
     return Response({"Success": CommonMessage.SEND_EMAIL_SUCCESS}, status=status.HTTP_200_OK)

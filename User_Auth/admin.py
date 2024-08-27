@@ -1,4 +1,5 @@
 from django.contrib import admin
+
 from User_Auth.models import User, UsersecurityQuestion
 from utility.email_utils import send_email
 
@@ -19,7 +20,9 @@ def block_users(modeladmin, request, queryset):
         send_email(subject, plain_text_body, html_template_path, context, to_email)
     modeladmin.message_user(request, "Selected users have been blocked.")
 
+
 block_users.short_description = "Block selected users"
+
 
 def unblock_users(modeladmin, request, queryset):
     queryset.update(is_block=False)
@@ -35,6 +38,7 @@ class UserAdmin(admin.ModelAdmin):
     list_display = ('username', 'email', 'first_name', 'last_name', 'is_block')
     list_filter = ('is_block',)
     search_fields = ('username', 'email', 'first_name', 'last_name')
+
 
 admin.site.register(User, UserAdmin)
 admin.site.register(UsersecurityQuestion)
