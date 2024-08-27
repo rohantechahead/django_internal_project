@@ -14,12 +14,16 @@ class UserConnectionSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+
+
 class ProfileConnectionSerializer(serializers.ModelSerializer):
     user_wishes = UserWishSerializers(many=True)
 
     class Meta:
         model = User
         fields = ['id','username', 'first_name', 'last_name', 'gender', 'dob', 'phone_no', 'user_wishes']
+
+
 
 
 class BlockedUserSerializer(serializers.ModelSerializer):
@@ -34,7 +38,10 @@ class BlockedUserSerializer(serializers.ModelSerializer):
 class ReportedUserSerializer(serializers.ModelSerializer):
     reporter_username = serializers.CharField(source='reporter_id.username', read_only=True)
     reported_username = serializers.CharField(source='reported_id.username', read_only=True)
+    # report_count = serializers.SerializerMethodField()
 
     class Meta:
         model = ReportedUser
         fields = "__all__"
+
+

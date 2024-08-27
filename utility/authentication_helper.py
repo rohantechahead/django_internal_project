@@ -7,6 +7,8 @@ from django.conf import settings
 from django.http import JsonResponse
 from rest_framework import status
 
+from User_Auth.models import User
+
 # Secret key for signing the JWT
 SECRET_KEY = settings.SECRET_KEY
 
@@ -108,6 +110,10 @@ def is_auth(fun):
 
             request.decoded_token_result = decode_token_result
             request.user_id = request.decoded_token_result.get("user_id")
+            user = User.objects.get(id=request.user_id)
+            if user.is_block:
+                return JsonResponse({"message": "User is blocked"}, status=status.HTTP_403_FORBIDDEN)
+
             return fun(request, *args, **kwargs)
 
         except jwt.ExpiredSignatureError:

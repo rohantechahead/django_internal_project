@@ -1,6 +1,6 @@
 from django.contrib.auth.hashers import make_password
 from django.db.models import Q
-from rest_framework import status
+from rest_framework import status, generics
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
@@ -12,12 +12,11 @@ from utility.authentication_helper import generate_refresh_token, generate_acces
 
 from utility.email_utils import send_email
 from .models import User, UsersecurityQuestion
-from .serializer import LoginSerializer, UserProfileSerializer
+from .serializer import LoginSerializer, UserProfileSerializer, UserSerializer
 from .validator import verifying_user_login, verifying_signup_request, verifying_forgotpassword_request, \
     verifying_refresh_token
 
 from utility.common_message import CommonMessage
-
 
 
 @signup_api_doc
@@ -65,13 +64,15 @@ def user_login(request):
     username_or_email = request.data.get('username')
     password = request.data.get('password')
     if not username_or_email or not password:
-        return Response({'error': 'Username and password are required'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'error': CommonMessage.REQUIRED_UNAME_PASSWORD}, status=status.HTTP_400_BAD_REQUEST)
     try:
         user = User.objects.get(Q(username=username_or_email) | Q(email=username_or_email))
     except User.DoesNotExist:
-        return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+        return Response({'error':CommonMessage.INVALID_CREDENTIAL }, status=status.HTTP_401_UNAUTHORIZED)
     if not user.check_password(password):
-        return Response({'error': 'Incorrect password'}, status=status.HTTP_401_UNAUTHORIZED)
+        return Response({'error': CommonMessage.INCORRECT_PASS}, status=status.HTTP_401_UNAUTHORIZED)
+    if user.is_block:
+        return Response({"message": CommonMessage.ADMIN_BLOCK_USER}, status=status.HTTP_403_FORBIDDEN)
     access_token = generate_access_token(user)
     refresh_token = generate_refresh_token(user)
 
@@ -81,7 +82,6 @@ def user_login(request):
         "refresh_token": refresh_token
 
     })
-
     user.refresh_token = str(refresh_token)
     user.is_login = True
 
@@ -152,7 +152,6 @@ def update_security_q_a(request):
 def get_security_q_a(request):
     user_id = request.user_id
 
-
     try:
         user = User.objects.get(id=user_id)
     except User.DoesNotExist:
@@ -216,7 +215,7 @@ def user_logout(request):
         user.is_login = False
         # Save the updated user instance to the database
         user.save()
-        return Response({'success': True, 'message': CommonMessage.USER_LOGOUT_SUCCESS }, status=status.HTTP_200_OK)
+        return Response({'success': True, 'message': CommonMessage.USER_LOGOUT_SUCCESS}, status=status.HTTP_200_OK)
 
     except User.DoesNotExist:
         return Response({'success': False, 'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
@@ -282,6 +281,7 @@ def get_refresh_token(request):
 
 @api_view(['POST'])
 def send_test_email(request):
+    receiver_email = request.data.get('receiver_email')
     subject = "New Friend Request"
     plain_text_body = "You have received a new friend request."
     html_template_path = "friend_request_email.html"  # Updated path
@@ -290,6 +290,12 @@ def send_test_email(request):
         "sender_name": "Jane Smith",
         "accept_request_link": "https://example.com/accept-request"
     }
-    to_email = "afzal@yopmail.com"
+    to_email = receiver_email
     send_email(subject, plain_text_body, html_template_path, context, to_email)
+
     return Response({"Success": CommonMessage.SEND_EMAIL_SUCCESS}, status=status.HTTP_200_OK)
+
+
+
+
+
