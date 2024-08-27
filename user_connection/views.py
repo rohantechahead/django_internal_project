@@ -136,8 +136,6 @@ def list_connection(request):
         user_id = request.user_id
         connections_type = request.query_params.get('connections_type')
 
-        # record = 10
-
         page = int(request.query_params.get('page', 1))
         page_size = int(request.query_params.get('page_size', 10))
 
@@ -171,12 +169,9 @@ def list_connection(request):
                             status=status.HTTP_404_NOT_FOUND)
 
         total_count = connections.count()
-        print("total_count",total_count)
         start = (page - 1) * page_size
         end = start + page_size
         connections_paginated = connections[start:end]
-        print("connection", connections_paginated)
-
 
         serializer = UserConnectionSerializer(connections_paginated, many=True)
         response_data = {
