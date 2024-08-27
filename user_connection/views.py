@@ -3,7 +3,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from User_Auth.models import User
-from User_Auth.serializer import LoginSerializer
+from User_Auth.serializer import LoginSerializer, UserProfileSerializer
 from utility.api_documantion_helper import send_request_api_doc, withdraw_send_request_api_doc, accept_reject_api_doc, \
     block_user_api_doc, report_user_api_doc, list_connection_api_doc, search_username_api_doc, get_profile_view_api_doc
 from utility.authentication_helper import is_auth
@@ -144,10 +144,17 @@ def list_connection(request):
             return Response({"blocked_connections": blocked_serializer.data}, status=status.HTTP_200_OK)
 
         elif connections_type == 'accepted':
-
-            connections = UserConnection.objects.filter(Q(sender_id=user_id) | Q(receiver_id=user_id), status=UserConnection.Status.APPROVED)
+            connections = UserConnection.objects.filter( Q(sender_id=user_id) | Q(receiver_id=user_id),status=UserConnection.Status.APPROVED)
         elif connections_type == 'pending':
-            connections = UserConnection.objects.filter(receiver_id=user_id, status=UserConnection.Status.PENDING)
+            connections = UserConnection.objects.filter(receiver_id=user_id,status=UserConnection.Status.PENDING)
+        elif 'friend_id' in request.query_params:
+            user_id = request.query_params.get('friend_id')
+            friends = UserConnection.objects.filter(Q(sender_id=user_id) | Q(receiver_id=user_id),status=UserConnection.Status.APPROVED)
+            if not friends.exists():
+                return Response({"message": "No friends found."}, status=status.HTTP_404_NOT_FOUND)
+            friends_serializer = UserConnectionSerializer(friends, many=True)
+            return Response({"friends": friends_serializer.data}, status=status.HTTP_200_OK)
+
         else:
             return Response({"error": "Invalid connection type provided."}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -159,9 +166,7 @@ def list_connection(request):
         return Response({"data": serializer.data}, status=status.HTTP_200_OK)
 
     except Exception as e:
-        # Consider logging the error
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
 
 @block_user_api_doc
 @api_view(['POST'])
@@ -261,6 +266,4 @@ def get_profile_view(request):
     profile_serializer = ProfileConnectionSerializer(user)
 
     return Response({"data": profile_serializer.data }, status=status.HTTP_200_OK)
-
-
 
