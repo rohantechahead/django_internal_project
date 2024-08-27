@@ -39,15 +39,15 @@ def verifying_forgotpassword_request(request):
     schema = {
 
         'security_a': {'type': 'string', 'required': True},
-
-        'security_q': {'type': 'string', 'required': True},
+        'security_q': {'type': 'string', 'required': False},
     }
-    if 'username' in request.data:
+    if 'username' in request.data :
         schema.update({
             'username': {'type': 'string', 'required': True},
 
             'new_password': {'type': 'string',  'required': True},
         })
+
     else:
         schema.update({
             'email': {'type': 'string', 'maxlength': 254, 'required': True},
@@ -55,12 +55,38 @@ def verifying_forgotpassword_request(request):
             'security_a': {'type': 'string', 'required': True},
         })
 
+
     v = Validator(schema)
     if v.validate(request.data):
         return True
     else:
         return False
 
+
+def verifying_resetpassword_request(request):
+
+    schema = {
+        'old_password': {'type': 'string', 'required': True},
+    }
+    if 'username' in request.data :
+        schema.update({
+            'username': {'type': 'string', 'required': True},
+            'new_password': {'type': 'string',  'required': True},
+        })
+
+    else:
+        schema.update({
+            'email': {'type': 'string', 'maxlength': 254, 'required': True},
+
+        })
+
+
+
+    v = Validator(schema)
+    if v.validate(request.data):
+        return True
+    else:
+        return False
 
 
 def verifying_refresh_token(request):

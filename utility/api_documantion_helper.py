@@ -1277,3 +1277,60 @@ def get_profile_view_api_doc(func):
     return wrap
 
 
+def reset_api_doc(func):
+    @swagger_auto_schema(
+        method='post',
+        operation_description="Reset password",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'username': openapi.Schema(type=openapi.TYPE_STRING, description='Username or email'),
+                'old_password': openapi.Schema(type=openapi.TYPE_STRING, description='Old password'),
+                'new_password': openapi.Schema(type=openapi.TYPE_STRING, description='New password')
+            },
+            required=['username',  'old_password', 'new_password']
+        ),
+        responses={
+            200: openapi.Response(
+                description='Password reset successfully',
+                examples={
+                    'application/json': {
+                        'success': True,
+                        'message': 'Password reset successfully'
+                    }
+                }
+            ),
+            400: openapi.Response(
+                description='Invalid data',
+                examples={
+                    'application/json': {
+                        'success': False,
+                        'message': 'Invalid data'
+                    }
+                }
+            ),
+            404: openapi.Response(
+                description='User or security question not found',
+                examples={
+                    'application/json': {
+                        'error': 'User not found or security question not found'
+                    }
+                }
+            ),
+            401: openapi.Response(
+                description='Incorrect security question or answer',
+                examples={
+                    'application/json': {
+                        'error': 'Security question or answer is incorrect'
+                    }
+                }
+            )
+        }
+    )
+    @wraps(func)
+    def wrap(request, *args, **kwargs):
+        return func(request, *args, **kwargs)
+
+    return wrap
+
+

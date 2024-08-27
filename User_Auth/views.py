@@ -3,18 +3,19 @@ from django.db.models import Q
 from rest_framework import status, generics
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from django.contrib.auth.hashers import check_password
 
 from utility.api_documantion_helper import (login_api_doc, signup_api_doc, forgot_api_doc,
                                             update_security_api_doc, get_security_api_doc, logout_api_doc,
                                             update_profile_api_doc, get_profile_api_doc,
-                                            user_delete_api_doc, get_refresh_token_api_doc)
+                                            user_delete_api_doc, get_refresh_token_api_doc, reset_api_doc)
 from utility.authentication_helper import generate_refresh_token, generate_access_token, is_auth
 
 from utility.email_utils import send_email
 from .models import User, UsersecurityQuestion
 from .serializer import LoginSerializer, UserProfileSerializer, UserSerializer
 from .validator import verifying_user_login, verifying_signup_request, verifying_forgotpassword_request, \
-    verifying_refresh_token
+    verifying_refresh_token, verifying_resetpassword_request
 
 from utility.common_message import CommonMessage
 
@@ -296,6 +297,29 @@ def send_test_email(request):
     return Response({"Success": CommonMessage.SEND_EMAIL_SUCCESS}, status=status.HTTP_200_OK)
 
 
+@reset_api_doc
+@api_view(['POST'])
+def reset_password_api(request):
+    # Validate the request data
+    if not verifying_resetpassword_request(request):
+        return Response({'success': False, 'message': 'Invalid data'}, status=status.HTTP_400_BAD_REQUEST)
 
+    username_or_email = request.data.get('username')
+    old_password = request.data.get('old_password')
+    new_password = request.data.get('new_password')
+
+    # Try to find the user by username or email
+    try:
+        user = User.objects.get(Q(username=username_or_email) | Q(email=username_or_email))
+    except User.DoesNotExist:
+        return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    if not check_password(old_password, user.password):
+        return Response({'success': False, 'message': 'Old password is incorrect'}, status=status.HTTP_401_UNAUTHORIZED)
+    # Set the new password
+    user.set_password(new_password)
+    user.save()
+
+    return Response({'success': True, 'message': CommonMessage.PASSWORD_RESET_SUCCESS}, status=status.HTTP_200_OK)
 
 
