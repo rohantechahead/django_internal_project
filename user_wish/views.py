@@ -48,15 +48,16 @@ def get_user_wish(request):
     serializer = UserWishSerializers(user_wish, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
+
 @user_wish_update_api_doc
 @api_view(['PUT'])
 @is_auth
-def user_wish_update(request, pk):
+def user_wish_update(request,pk):
     if not verifying_request(request):
         return Response({"Message": "User not verified"}, status=status.HTTP_400_BAD_REQUEST)
 
     user_id = request.user_id
-    user_wishes = UserWish.objects.get(userwish_id=user_id, pk=pk)
+    user_wishes = UserWish.objects.get(userwish_id=user_id,pk=pk)
 
     updated_title = request.data.get("title")
     updated_description = request.data.get("description")
@@ -67,8 +68,8 @@ def user_wish_update(request, pk):
     # Serialize the updated user_wishes
     serializer = UserWishSerializers(user_wishes)
 
-    return Response({"message": CommonMessage.USER_WISH_UPDATE_SUCCESS, "data": serializer.data}, status=status.HTTP_200_OK)
 
+    return Response({"message": CommonMessage.USER_WISH_UPDATE_SUCCESS, "data": serializer.data}, status=status.HTTP_200_OK)
 
 
 @api_view(['DELETE'])
@@ -83,4 +84,5 @@ def user_wish_delete(request,pk):
 
     user_wishes.delete()
     return Response({"Message": CommonMessage.USER_WISH_DELETE_SUCCESS},status=status.HTTP_204_NO_CONTENT)
+
 

@@ -5,6 +5,8 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
+from User_Auth.serializer import LoginSerializer
+
 
 from User_Auth.serializer import LoginSerializer
 
@@ -877,7 +879,6 @@ def list_connection_api_doc(func):
     return wrap
 
 
-
 def accept_reject_api_doc(func):
     @swagger_auto_schema(
         method='post',
@@ -1219,11 +1220,6 @@ def search_username_api_doc(func):
         return func(request, *args, **kwargs)
 
     return wrap
-
-
-from functools import wraps
-from drf_yasg.utils import swagger_auto_schema
-from drf_yasg import openapi
 
 
 def get_profile_view_api_doc(func):
