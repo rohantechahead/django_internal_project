@@ -1221,7 +1221,6 @@ def search_username_api_doc(func):
 
     return wrap
 
-
 def get_profile_view_api_doc(func):
     @swagger_auto_schema(
         method='get',
