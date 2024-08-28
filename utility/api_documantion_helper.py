@@ -817,7 +817,29 @@ def list_connection_api_doc(func):
                 openapi.IN_QUERY,
                 description="Type of connections to retrieve (blocked, accepted, pending)",
                 type=openapi.TYPE_STRING,
-                required=True
+                required=False
+            ),
+
+            openapi.Parameter(
+                'friend_id',
+                openapi.IN_QUERY,
+                description="User ID to retrieve friends of a specific user",
+                type=openapi.TYPE_INTEGER,
+                required=False
+            ),
+            openapi.Parameter(
+                'page',
+                openapi.IN_QUERY,
+                description="Page number for pagination (default: 1)",
+                type=openapi.TYPE_INTEGER,
+                required=False
+            ),
+            openapi.Parameter(
+                'page_size',
+                openapi.IN_QUERY,
+                description="Number of results per page for pagination (default: 10)",
+                type=openapi.TYPE_INTEGER,
+                required=False
             ),
             openapi.Parameter(
                 'Authorization',
@@ -1189,7 +1211,15 @@ def user_wish_update_api_doc(func):
 def search_username_api_doc(func):
     @swagger_auto_schema(
         method='get',
+        operation_description="Search Username in Logged ID ",
         manual_parameters=[
+            openapi.Parameter(
+                'Authorization',
+                openapi.IN_HEADER,
+                description="Bearer token",
+                type=openapi.TYPE_STRING,
+                required=True,
+            ),
             openapi.Parameter(
                 'username',
                 openapi.IN_QUERY,
@@ -1197,7 +1227,9 @@ def search_username_api_doc(func):
                 type=openapi.TYPE_STRING,
                 required=False,
             ),
-        ],
+    ],
+
+
         responses={
             200: openapi.Response(
                 description="A list of users matching the search criteria",

@@ -157,10 +157,25 @@ def list_connection(request):
             return Response(response_data, status=status.HTTP_200_OK)
 
         elif connections_type == 'accepted':
-
-            connections = UserConnection.objects.filter(Q(sender_id=user_id) | Q(receiver_id=user_id), status=UserConnection.Status.APPROVED)
+            connections = UserConnection.objects.filter(Q(sender_id=user_id) | Q(receiver_id=user_id),status=UserConnection.Status.APPROVED)
         elif connections_type == 'pending':
-            connections = UserConnection.objects.filter(receiver_id=user_id, status=UserConnection.Status.PENDING)
+            connections = UserConnection.objects.filter(receiver_id=user_id,status=UserConnection.Status.PENDING)
+        elif 'friend_id' in request.query_params:
+            user_id = request.query_params.get('friend_id')
+            friends = UserConnection.objects.filter(Q(sender_id=user_id) | Q(receiver_id=user_id),status=UserConnection.Status.APPROVED)
+            if not friends.exists():
+                return Response({"message": "No friends found."}, status=status.HTTP_404_NOT_FOUND)
+            total_count = friends.count()
+            start = (page - 1) * page_size
+            end = start + page_size
+            friends_paginated = friends[start:end]
+            serializer = UserConnectionSerializer(friends_paginated, many=True)
+            response_data = {
+                "count": total_count,
+                "data": serializer.data,
+            }
+
+            return Response(response_data, status=status.HTTP_200_OK)
         else:
             return Response({"error": "Invalid connection type provided."}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -178,10 +193,10 @@ def list_connection(request):
             "count": total_count,
             "data": serializer.data,
         }
+
         return Response(response_data, status=status.HTTP_200_OK)
 
     except Exception as e:
-        # Consider logging the error
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @block_user_api_doc
