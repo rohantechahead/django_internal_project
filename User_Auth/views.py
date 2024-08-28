@@ -296,6 +296,7 @@ def send_test_email(request):
 
     return Response({"Success": CommonMessage.SEND_EMAIL_SUCCESS}, status=status.HTTP_200_OK)
 
+<<<<<<< Updated upstream
 @reset_api_doc
 @api_view(['POST'])
 def reset_password_api(request):
@@ -321,5 +322,9 @@ def reset_password_api(request):
 
     return Response({'success': True, 'message': CommonMessage.PASSWORD_RESET_SUCCESS}, status=status.HTTP_200_OK)
 
+=======
+
+
+>>>>>>> Stashed changes
 
 
