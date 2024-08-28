@@ -13,6 +13,7 @@ from .serializers import UserConnectionSerializer, BlockedUserSerializer, Report
     ProfileConnectionSerializer
 from .validators import verifying_user_connection_request,verifying_accept_reject_request, verifying_user_report
 from utility.common_message import CommonMessage
+from utility.common_helper import common_pagination
 
 
 @send_request_api_doc
@@ -127,7 +128,6 @@ def withdraw_send_request(request):
     connection.delete()
     return Response({"message": CommonMessage.WITHDRAW_REQUEST_SUCCESS}, status=status.HTTP_200_OK)
 
-
 @list_connection_api_doc
 @api_view(['GET'])
 @is_auth
@@ -145,9 +145,7 @@ def list_connection(request):
                 return Response({"message": "No blocked connections found."}, status=status.HTTP_404_NOT_FOUND)
 
             total_count = blocked_connections.count()
-            start = (page - 1) * page_size
-            end = start + page_size
-            blocked_connections_paginated = blocked_connections[start:end]
+            blocked_connections_paginated = common_pagination(page, page_size, blocked_connections)
 
             blocked_serializer = BlockedUserSerializer(blocked_connections_paginated, many=True)
             response_data = {
@@ -157,25 +155,26 @@ def list_connection(request):
             return Response(response_data, status=status.HTTP_200_OK)
 
         elif connections_type == 'accepted':
-            connections = UserConnection.objects.filter(Q(sender_id=user_id) | Q(receiver_id=user_id),status=UserConnection.Status.APPROVED)
+            connections = UserConnection.objects.filter(Q(sender_id=user_id) | Q(receiver_id=user_id), status=UserConnection.Status.APPROVED)
+
         elif connections_type == 'pending':
-            connections = UserConnection.objects.filter(receiver_id=user_id,status=UserConnection.Status.PENDING)
+            connections = UserConnection.objects.filter(receiver_id=user_id, status=UserConnection.Status.PENDING)
+
         elif 'friend_id' in request.query_params:
             user_id = request.query_params.get('friend_id')
-            friends = UserConnection.objects.filter(Q(sender_id=user_id) | Q(receiver_id=user_id),status=UserConnection.Status.APPROVED)
+            friends = UserConnection.objects.filter(Q(sender_id=user_id) | Q(receiver_id=user_id), status=UserConnection.Status.APPROVED)
             if not friends.exists():
                 return Response({"message": "No friends found."}, status=status.HTTP_404_NOT_FOUND)
+
             total_count = friends.count()
-            start = (page - 1) * page_size
-            end = start + page_size
-            friends_paginated = friends[start:end]
+            friends_paginated = common_pagination(page, page_size, friends)
             serializer = UserConnectionSerializer(friends_paginated, many=True)
             response_data = {
                 "count": total_count,
                 "data": serializer.data,
             }
-
             return Response(response_data, status=status.HTTP_200_OK)
+
         else:
             return Response({"error": "Invalid connection type provided."}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -184,9 +183,7 @@ def list_connection(request):
                             status=status.HTTP_404_NOT_FOUND)
 
         total_count = connections.count()
-        start = (page - 1) * page_size
-        end = start + page_size
-        connections_paginated = connections[start:end]
+        connections_paginated = common_pagination(page, page_size, connections)
 
         serializer = UserConnectionSerializer(connections_paginated, many=True)
         response_data = {
@@ -198,6 +195,7 @@ def list_connection(request):
 
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 @block_user_api_doc
 @api_view(['POST'])
@@ -262,11 +260,22 @@ def report_user(request):
 @is_auth
 def search_username(request):
     try:
-        search_username= request.query_params.get('username')
-        users = User.objects.filter(username__icontains=search_username)
-        serializer = LoginSerializer(users, many=True)
+        search_username = request.query_params.get('username')
+        page = int(request.query_params.get('page', 1))
+        page_size = int(request.query_params.get('page_size', 10))
 
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        users = User.objects.filter(username__icontains=search_username)
+
+        paginated_users = common_pagination(page, page_size, users)
+        total_count = users.count()
+
+        serializer = LoginSerializer(paginated_users, many=True)
+        response_data = {
+            "count": total_count,
+            "data": serializer.data,
+        }
+
+        return Response(response_data, status=status.HTTP_200_OK)
 
     except Exception as e:
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -278,10 +287,12 @@ def search_username(request):
 def get_profile_view(request):
     user_id = request.user_id
     connection_id = request.query_params.get("connection_id")
+    page = int(request.query_params.get('page', 1))
+    page_size = int(request.query_params.get('page_size', 10))
 
     try:
         user = User.objects.get(id=connection_id)
-        # Check if there is an approved connection between the current user and the specified user
+
         connection = UserConnection.objects.filter(
             (Q(sender_id=user_id) & Q(receiver_id=connection_id)) |
             (Q(sender_id=connection_id) & Q(receiver_id=user_id)),
@@ -291,10 +302,27 @@ def get_profile_view(request):
         if not connection:
             return Response({"username": user.username}, status=status.HTTP_200_OK)
 
+        connections = UserConnection.objects.filter(
+            (Q(sender_id=user_id) | Q(receiver_id=user_id)),
+            status=UserConnection.Status.APPROVED
+        )
+
+        paginated_connections = common_pagination(page, page_size, connections)
+        total_count = connections.count()
+
+        connection_serializer = UserConnectionSerializer(paginated_connections, many=True)
+        profile_serializer = ProfileConnectionSerializer(user)
+
+        response_data = {
+            "profile": profile_serializer.data,
+            "connections_count": total_count,
+            "connections": connection_serializer.data,
+        }
+
+        return Response(response_data, status=status.HTTP_200_OK)
+
     except User.DoesNotExist:
         return Response({"error": "User Not Found"}, status=status.HTTP_400_BAD_REQUEST)
-
-    profile_serializer = ProfileConnectionSerializer(user)
-
-    return Response({"data": profile_serializer.data }, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
