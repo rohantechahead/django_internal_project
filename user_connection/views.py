@@ -165,8 +165,17 @@ def list_connection(request):
             friends = UserConnection.objects.filter(Q(sender_id=user_id) | Q(receiver_id=user_id),status=UserConnection.Status.APPROVED)
             if not friends.exists():
                 return Response({"message": "No friends found."}, status=status.HTTP_404_NOT_FOUND)
-            friends_serializer = UserConnectionSerializer(friends, many=True)
-            return Response({"friends": friends_serializer.data}, status=status.HTTP_200_OK)
+            total_count = friends.count()
+            start = (page - 1) * page_size
+            end = start + page_size
+            friends_paginated = friends[start:end]
+            serializer = UserConnectionSerializer(friends_paginated, many=True)
+            response_data = {
+                "count": total_count,
+                "data": serializer.data,
+            }
+
+            return Response(response_data, status=status.HTTP_200_OK)
         else:
             return Response({"error": "Invalid connection type provided."}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -184,6 +193,7 @@ def list_connection(request):
             "count": total_count,
             "data": serializer.data,
         }
+
         return Response(response_data, status=status.HTTP_200_OK)
 
     except Exception as e:

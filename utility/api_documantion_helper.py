@@ -828,6 +828,20 @@ def list_connection_api_doc(func):
                 required=False
             ),
             openapi.Parameter(
+                'page',
+                openapi.IN_QUERY,
+                description="Page number for pagination (default: 1)",
+                type=openapi.TYPE_INTEGER,
+                required=False
+            ),
+            openapi.Parameter(
+                'page_size',
+                openapi.IN_QUERY,
+                description="Number of results per page for pagination (default: 10)",
+                type=openapi.TYPE_INTEGER,
+                required=False
+            ),
+            openapi.Parameter(
                 'Authorization',
                 openapi.IN_HEADER,
                 description="list connection Token for authorization (e.g., Bearer <token>)",
