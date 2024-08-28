@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .views import forgot_password_api, update_security_q_a, get_security_q_a
+from .views import forgot_password_api, update_security_q_a, get_security_q_a, reset_password_api
 from .views import get_profile, user_delete
 from .views import user_login, signup_api, update_profile, user_logout, get_refresh_token, send_test_email
 
@@ -20,6 +20,8 @@ urlpatterns = [
 
     path('refresh-token/', get_refresh_token, name='refresh-token'),
     path('send-email/', send_test_email, name='send_test_email'),
+
+    path('reset-password/',reset_password_api,name='reset-password')
 
 
 ]
