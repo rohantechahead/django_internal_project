@@ -8,5 +8,3 @@ class UserWishSerializers(serializers.ModelSerializer):
     class Meta:
         model=UserWish
         fields="__all__"
-
-

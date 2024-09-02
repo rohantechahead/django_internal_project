@@ -49,5 +49,6 @@ urlpatterns = [
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
     path("user-connection/", include('user_connection.urls')),
     path("user-wish/", include('user_wish.urls')),
+    path("user-notification/", include('user_notification.urls')),
 
 ]

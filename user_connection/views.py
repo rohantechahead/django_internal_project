@@ -4,6 +4,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from User_Auth.models import User
 from User_Auth.serializer import LoginSerializer
+from user_notification.models import Notification
 from utility.api_documantion_helper import send_request_api_doc, withdraw_send_request_api_doc, accept_reject_api_doc, \
 block_user_api_doc, report_user_api_doc, list_connection_api_doc, search_username_api_doc, get_profile_view_api_doc
 
@@ -81,6 +82,17 @@ def handle_friend_request(request):
     if action == 'accept':
 
         connection.status = UserConnection.Status.APPROVED
+        connection.save()
+
+
+        notification = Notification(
+            sender=receiver,
+            receiver=sender,
+            message=f"Hi {sender.username}, your friend request to {receiver.username} was accepted!",
+            notification_type="Friend Request",
+            is_read=True
+        )
+        notification.save()
 
         subject = "Your Friend Request is Accepted!"
         plain_text_body = f"Hi {sender.username}, your friend request to {receiver.username} was accepted!"
@@ -91,8 +103,6 @@ def handle_friend_request(request):
             "connect_profile_link": "https://example.com/connect-profile"  # Replace with actual link
         }
         to_email = sender.email
-
-        # Assuming send_email is a function defined elsewhere in your codebase
         send_email(subject, plain_text_body, html_template_path, context, to_email)
         connection.save()
 

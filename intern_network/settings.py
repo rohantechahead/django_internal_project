@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     "User_Auth",
     "user_connection",
     "user_wish",
+    "user_notification",
 
 ]
 
