@@ -17,6 +17,7 @@ from .serializers import UserConnectionSerializer, BlockedUserSerializer, Report
 from .validators import verifying_user_connection_request,verifying_accept_reject_request, verifying_user_report
 from utility.common_message import CommonMessage
 from utility.common_helper import common_pagination
+from utility.common_helper import create_notification
 
 
 @send_request_api_doc
@@ -85,14 +86,12 @@ def handle_friend_request(request):
         connection.save()
 
 
-        notification = Notification(
+        create_notification(
             sender=receiver,
             receiver=sender,
             message=f"Hi {sender.username}, your friend request to {receiver.username} was accepted!",
-            notification_type="Friend Request",
-            is_read=True
+            notification_type="Friend Request"
         )
-        notification.save()
 
         subject = "Your Friend Request is Accepted!"
         plain_text_body = f"Hi {sender.username}, your friend request to {receiver.username} was accepted!"
@@ -336,4 +335,3 @@ def get_profile_view(request):
         return Response({"error": "User Not Found"}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-

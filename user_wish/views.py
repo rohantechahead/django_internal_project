@@ -9,6 +9,7 @@ from utility.authentication_helper import is_auth
 from utility.common_helper import common_pagination
 from .validators import verifying_user_request, verifying_request
 from utility.common_message import CommonMessage
+from utility.common_helper import create_notification
 
 
 # Create your views here.
@@ -35,7 +36,14 @@ def UserWishAdd(request):
         return Response({"error": "UserWish already created"}, status=status.HTTP_400_BAD_REQUEST)
 
     connection = UserWish.objects.create(userwish_id=user, title=title, description=description, tag_id=tag)
+
     serializer = UserWishSerializers(connection)
+    create_notification(
+        sender=user,
+        receiver=tag,
+        message=f"Your wish '{title}' was successfully added!",
+        notification_type="User Wish"
+    )
 
     return Response({"message": CommonMessage.USER_WISH_SUCCESS, "data": serializer.data},
                     status=status.HTTP_201_CREATED)
@@ -99,5 +107,3 @@ def user_wish_delete(request,pk):
 
     user_wishes.delete()
     return Response({"Message": CommonMessage.USER_WISH_DELETE_SUCCESS},status=status.HTTP_204_NO_CONTENT)
-
-

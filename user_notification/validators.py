@@ -1,6 +1,6 @@
 from cerberus import Validator
 
-def validate_notification_data(data):
+def validate_notification_data(request):
     schema = {
         'receiver_id': {'type': 'integer', 'required': True},
         'message': {'type': 'string', 'minlength': 1, 'required': True},
@@ -8,7 +8,8 @@ def validate_notification_data(data):
         'is_read': {'type': 'boolean', 'default': False},
     }
     v = Validator(schema)
-    if v.validate(data):
+    if v.validate(request.data):
         return True
     else:
-        return v.errors
+        return False
+

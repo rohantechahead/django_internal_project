@@ -11,7 +11,6 @@ def verifying_user_request(request):
     if v.validate(request.data, schema):
         return True
     else:
-        print(v.errors)
         return False
 
 def verifying_request(request):
@@ -36,6 +35,4 @@ def verifying_request(request):
         return True
     else:
         return False
-
-
 
