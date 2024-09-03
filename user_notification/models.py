@@ -6,7 +6,8 @@ class Notification(models.Model):
     NOTIFICATION_TYPES = [
         ('Friend_Request', 'Friend Request'),
         ('Message', 'Message'),
-        ('Reminder', 'Reminder')
+        ('Reminder', 'Reminder'),
+        ('Tag_Wish', 'Tag Wish')
     ]
 
     sender = models.ForeignKey(User, related_name='sent_notifications', on_delete=models.CASCADE)
@@ -16,4 +17,3 @@ class Notification(models.Model):
     is_read = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-

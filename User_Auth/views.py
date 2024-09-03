@@ -343,7 +343,3 @@ def reset_password_api(request):
     user.save()
 
     return Response({'success': True, 'message': CommonMessage.PASSWORD_RESET_SUCCESS}, status=status.HTTP_200_OK)
-
-
-
-
