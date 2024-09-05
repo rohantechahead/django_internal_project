@@ -29,7 +29,8 @@ def mark_notification_as_read_or_delete(request, notification_id, action):
     except Notification.DoesNotExist:
         return Response({"error": "Notification not found."}, status=status.HTTP_404_NOT_FOUND)
 
-
+@api_view(['GET'])
+@is_auth
 def list_notifications(request):
 
     user_id = request.user_id
