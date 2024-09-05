@@ -307,6 +307,20 @@ def get_security_api_doc(func):
                 type=openapi.TYPE_STRING,
                 required=True,
             ),
+            openapi.Parameter(
+                'page',
+                openapi.IN_QUERY,
+                description="Page number for pagination (default: 1)",
+                type=openapi.TYPE_INTEGER,
+                required=False
+            ),
+            openapi.Parameter(
+                'page_size',
+                openapi.IN_QUERY,
+                description="Number of results per page for pagination (default: 10)",
+                type=openapi.TYPE_INTEGER,
+                required=False
+            ),
         ],
         responses={
             200: openapi.Response(
@@ -438,6 +452,20 @@ def get_profile_api_doc(func):
                 description="Bearer token",
                 type=openapi.TYPE_STRING,
                 required=True,
+            ),
+            openapi.Parameter(
+                'page',
+                openapi.IN_QUERY,
+                description="Page number for pagination (default: 1)",
+                type=openapi.TYPE_INTEGER,
+                required=False
+            ),
+            openapi.Parameter(
+                'page_size',
+                openapi.IN_QUERY,
+                description="Number of results per page for pagination (default: 10)",
+                type=openapi.TYPE_INTEGER,
+                required=False
             ),
         ],
         responses={
@@ -1121,6 +1149,20 @@ def get_user_wish_api_doc(func):
                 type=openapi.TYPE_STRING,
                 required=True,
             ),
+            openapi.Parameter(
+                'page',
+                openapi.IN_QUERY,
+                description="Page number for pagination (default: 1)",
+                type=openapi.TYPE_INTEGER,
+                required=False
+            ),
+            openapi.Parameter(
+                'page_size',
+                openapi.IN_QUERY,
+                description="Number of results per page for pagination (default: 10)",
+                type=openapi.TYPE_INTEGER,
+                required=False
+            ),
         ],
 
         responses={
@@ -1222,6 +1264,20 @@ def search_username_api_doc(func):
                 required=True,
             ),
             openapi.Parameter(
+                'page',
+                openapi.IN_QUERY,
+                description="Page number for pagination (default: 1)",
+                type=openapi.TYPE_INTEGER,
+                required=False
+            ),
+            openapi.Parameter(
+                'page_size',
+                openapi.IN_QUERY,
+                description="Number of results per page for pagination (default: 10)",
+                type=openapi.TYPE_INTEGER,
+                required=False
+            ),
+            openapi.Parameter(
                 'username',
                 openapi.IN_QUERY,
                 description="Partial or full username to search for. The API returns users whose usernames contain this value.",
@@ -1271,6 +1327,20 @@ def get_profile_view_api_doc(func):
                 description="ID of the connection (friend)",
                 type=openapi.TYPE_STRING,
                 required=True,
+            ),
+            openapi.Parameter(
+                'page',
+                openapi.IN_QUERY,
+                description="Page number for pagination (default: 1)",
+                type=openapi.TYPE_INTEGER,
+                required=False
+            ),
+            openapi.Parameter(
+                'page_size',
+                openapi.IN_QUERY,
+                description="Number of results per page for pagination (default: 10)",
+                type=openapi.TYPE_INTEGER,
+                required=False
             ),
         ],
         responses={

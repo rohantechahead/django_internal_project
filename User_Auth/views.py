@@ -10,6 +10,7 @@ from utility.api_documantion_helper import (login_api_doc, signup_api_doc, forgo
                                             update_profile_api_doc, get_profile_api_doc,
                                             user_delete_api_doc, get_refresh_token_api_doc, reset_api_doc)
 from utility.authentication_helper import generate_refresh_token, generate_access_token, is_auth
+from utility.common_helper import common_pagination
 
 from utility.email_utils import send_email
 from .models import User, UsersecurityQuestion
@@ -152,6 +153,8 @@ def update_security_q_a(request):
 @is_auth
 def get_security_q_a(request):
     user_id = request.user_id
+    page = int(request.query_params.get('page', 1))
+    page_size = int(request.query_params.get('page_size', 10))
 
     try:
         user = User.objects.get(id=user_id)
@@ -159,15 +162,27 @@ def get_security_q_a(request):
         return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
 
     try:
-        user_security_q = UsersecurityQuestion.objects.get(user_id=user)
+        security_questions = UsersecurityQuestion.objects.filter(user_id=user)
+
+        paginated_questions = common_pagination(page, page_size, security_questions)
+        total_count = security_questions.count()
+
+        data = {
+            'count': total_count,
+            'security_questions': [
+                {
+                    'security_q': sq.security_q,
+                    'security_a': sq.security_a,
+                } for sq in paginated_questions
+            ],
+        }
+
+        return Response(data, status=status.HTTP_200_OK)
+
     except UsersecurityQuestion.DoesNotExist:
         return Response({'error': 'Security question not found'}, status=status.HTTP_404_NOT_FOUND)
-
-    data = {
-        'security_q': user_security_q.security_q,
-        'security_a': user_security_q.security_a,
-    }
-    return Response(data, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @update_profile_api_doc
@@ -240,13 +255,21 @@ def user_logout(request):
 @api_view(['GET'])
 @is_auth
 def get_profile(request):
-    user_id = request.user_id
+    page = int(request.query_params.get('page', 1))
+    page_size = int(request.query_params.get('page_size', 10))
     try:
-        user = User.objects.get(id=user_id)
-    except User.DoesNotExist:
-        return Response({"Error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
-    serializer = UserProfileSerializer(user)
-    return Response(serializer.data, status=status.HTTP_200_OK)
+        users = User.objects.all()
+        paginated_users = common_pagination(page, page_size, users)
+        total_count = users.count()
+        serializer = UserProfileSerializer(paginated_users, many=True)
+        response_data = {
+            "count": total_count,
+            "profiles": serializer.data,
+        }
+        return Response(response_data, status=status.HTTP_200_OK)
+
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @user_delete_api_doc
@@ -320,7 +343,3 @@ def reset_password_api(request):
     user.save()
 
     return Response({'success': True, 'message': CommonMessage.PASSWORD_RESET_SUCCESS}, status=status.HTTP_200_OK)
-
-
-
-

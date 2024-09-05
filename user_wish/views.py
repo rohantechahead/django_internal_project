@@ -6,8 +6,10 @@ from user_wish.models import UserWish
 from user_wish.serializers import UserWishSerializers
 from utility.api_documantion_helper import UserWishAddapi_doc, get_user_wish_api_doc,user_wish_update_api_doc
 from utility.authentication_helper import is_auth
+from utility.common_helper import common_pagination
 from .validators import verifying_user_request, verifying_request
 from utility.common_message import CommonMessage
+from utility.common_helper import create_notification
 
 
 # Create your views here.
@@ -34,7 +36,14 @@ def UserWishAdd(request):
         return Response({"error": "UserWish already created"}, status=status.HTTP_400_BAD_REQUEST)
 
     connection = UserWish.objects.create(userwish_id=user, title=title, description=description, tag_id=tag)
+
     serializer = UserWishSerializers(connection)
+    create_notification(
+        sender=user,
+        receiver=tag,
+        message=f"Your wish '{title}' was successfully added!",
+        notification_type="User Wish"
+    )
 
     return Response({"message": CommonMessage.USER_WISH_SUCCESS, "data": serializer.data},
                     status=status.HTTP_201_CREATED)
@@ -44,9 +53,23 @@ def UserWishAdd(request):
 @is_auth
 def get_user_wish(request):
     user_id = request.user_id
-    user_wish = UserWish.objects.filter(userwish_id=user_id)
-    serializer = UserWishSerializers(user_wish, many=True)
-    return Response(serializer.data, status=status.HTTP_200_OK)
+    page = int(request.query_params.get('page', 1))
+    page_size = int(request.query_params.get('page_size', 10))
+
+    try:
+        user_wishes = UserWish.objects.filter(userwish_id=user_id)
+        paginated_wishes = common_pagination(page, page_size, user_wishes)
+        total_count = user_wishes.count()
+        serializer = UserWishSerializers(paginated_wishes, many=True)
+        response_data = {
+            "count": total_count,
+            "wishes": serializer.data,
+        }
+        return Response(response_data, status=status.HTTP_200_OK)
+
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 
 @user_wish_update_api_doc
@@ -84,5 +107,3 @@ def user_wish_delete(request,pk):
 
     user_wishes.delete()
     return Response({"Message": CommonMessage.USER_WISH_DELETE_SUCCESS},status=status.HTTP_204_NO_CONTENT)
-
-

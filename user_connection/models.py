@@ -42,3 +42,6 @@ class ReportedUser(models.Model):
 
     class Meta:
         unique_together = ('reporter_id', 'reported_id')
+
+
+
