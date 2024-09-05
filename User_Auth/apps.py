@@ -10,6 +10,7 @@ class UserAuthConfig(AppConfig):
     name = 'User_Auth'
 
     def ready(self):
-        from utility.scheduler_helper import start_scheduler
-        start_scheduler()
+        from utility.scheduler_helper import start_scheduler, check_scheduler
 
+        start_scheduler()
+        check_scheduler()
