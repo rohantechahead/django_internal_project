@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from django.contrib.auth.hashers import make_password
 from django.db.models import Q
 from rest_framework import status, generics
@@ -13,12 +15,13 @@ from utility.authentication_helper import generate_refresh_token, generate_acces
 from utility.common_helper import common_pagination
 
 from utility.email_utils import send_email
-from .models import User, UsersecurityQuestion
+from .models import User, UsersecurityQuestion, UserDeleteData
 from .serializer import LoginSerializer, UserProfileSerializer, UserSerializer
 from .validator import verifying_user_login, verifying_signup_request, verifying_forgotpassword_request, \
     verifying_refresh_token, verifying_resetpassword_request
 
 from utility.common_message import CommonMessage
+from django.utils import timezone
 
 
 @signup_api_doc
@@ -71,6 +74,12 @@ def user_login(request):
         user = User.objects.get(Q(username=username_or_email) | Q(email=username_or_email))
     except User.DoesNotExist:
         return Response({'error':CommonMessage.INVALID_CREDENTIAL }, status=status.HTTP_401_UNAUTHORIZED)
+    if UserDeleteData.objects.filter(user=user).exists():
+        delete_record = UserDeleteData.objects.get(user=user)
+        if timezone.now() <= delete_record.deleted_date + timedelta(days=30):
+            user.is_login = True
+            user.save()
+            delete_record.delete()
     if not user.check_password(password):
         return Response({'error': CommonMessage.INCORRECT_PASS}, status=status.HTTP_401_UNAUTHORIZED)
     if user.is_block:
@@ -279,7 +288,9 @@ def user_delete(request):
     try:
         user_id = request.user_id
         user = User.objects.get(id=user_id)
-        user.delete()
+        user.is_login = False
+        user.save()
+        UserDeleteData.objects.create(user=user, deleted_date=timezone.now()) + timedelta(days=30)
         return Response({'success': True, 'message': CommonMessage.USER_DELETE_SUCCESS}, status=status.HTTP_200_OK)
     except User.DoesNotExist:
         return Response({'success': False, 'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)

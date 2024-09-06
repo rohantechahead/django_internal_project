@@ -1,10 +1,14 @@
 import datetime
+from datetime import timedelta
+
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.date import DateTrigger
-from User_Auth.models import User
+from django.utils import timezone
+
+from User_Auth.models import User, UserDeleteData
 from user_connection.models import UserConnection
 from user_notification.models import Notification
-from django.utils import timezone
+
 
 def send_birthday_reminders():
     try:
@@ -47,10 +51,46 @@ def start_scheduler():
         replace_existing=True,
     )
     scheduler.start()
-    job = scheduler.get_job('birthday_reminder_job')
+    job = scheduler.get_job('bi'
+                            'rthday_reminder_job')
     if job:
         print(f"Job added successfully: {job}")
     else:
         print("Job not added.")
 
+
 start_scheduler()
+
+
+def check_deleted_users():
+    try:
+        current_time = timezone.now()
+        expired_users = UserDeleteData.objects.filter(deleted_date__lte=current_time).values_list('user_id', flat=True)
+
+        User.objects.get(id__in=expired_users).delete()
+
+        print("Deleted expired users successfully.")
+    except Exception as e:
+        print(f"An error occurred in check_deleted_users: {e}")
+
+
+def check_scheduler():
+    scheduler = BackgroundScheduler()
+
+    scheduler.add_job(
+        check_deleted_users,
+        'interval',
+        days=1,
+        id='check_deleted_users_job',
+        max_instances=1,
+        replace_existing=True,
+    )
+    scheduler.start()
+    job = scheduler.get_job('check_deleted_users_job')
+    if job:
+        print(f"Job added successfully: {job}")
+    else:
+        print("Job not added.")
+
+
+check_scheduler()
