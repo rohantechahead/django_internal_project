@@ -65,8 +65,9 @@ start_scheduler()
 def check_deleted_users():
     try:
         current_time = timezone.now()
-        expired_users = UserDeleteData.objects.filter(deleted_date__lte=current_time).values_list('user_id', flat=True)
-
+        # expired_users = UserDeleteData.objects.filter(deleted_date__lte=current_time).values_list('user_id', flat=True)
+        expired_users = UserDeleteData.objects.filter(deleted_date__lte=current_time - timedelta(days=30)).values_list(
+            'user_id', flat=True)
         User.objects.get(id__in=expired_users).delete()
 
         print("Deleted expired users successfully.")
