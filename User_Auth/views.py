@@ -74,6 +74,12 @@ def user_login(request):
         user = User.objects.get(Q(username=username_or_email) | Q(email=username_or_email))
     except User.DoesNotExist:
         return Response({'error':CommonMessage.INVALID_CREDENTIAL }, status=status.HTTP_401_UNAUTHORIZED)
+    if UserDeleteData.objects.filter(user=user).exists():
+        delete_record = UserDeleteData.objects.get(user=user)
+        if timezone.now() <= delete_record.deleted_date + timedelta(days=30):
+            user.is_login = True
+            user.save()
+            delete_record.delete()
     if not user.check_password(password):
         return Response({'error': CommonMessage.INCORRECT_PASS}, status=status.HTTP_401_UNAUTHORIZED)
     if user.is_block:
@@ -284,7 +290,7 @@ def user_delete(request):
         user = User.objects.get(id=user_id)
         user.is_login = False
         user.save()
-        UserDeleteData.objects.create(user=user, deleted_date=timezone.now() + timedelta(days=30))
+        UserDeleteData.objects.create(user=user, deleted_date=timezone.now()) + timedelta(days=30)
         return Response({'success': True, 'message': CommonMessage.USER_DELETE_SUCCESS}, status=status.HTTP_200_OK)
     except User.DoesNotExist:
         return Response({'success': False, 'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)

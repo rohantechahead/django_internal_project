@@ -51,7 +51,8 @@ def start_scheduler():
         replace_existing=True,
     )
     scheduler.start()
-    job = scheduler.get_job('birthday_reminder_job')
+    job = scheduler.get_job('bi'
+                            'rthday_reminder_job')
     if job:
         print(f"Job added successfully: {job}")
     else:
@@ -64,9 +65,7 @@ start_scheduler()
 def check_deleted_users():
     try:
         current_time = timezone.now()
-        date_expire = current_time - timedelta(days=30)
-
-        expired_users = UserDeleteData.objects.filter(deleted_date__lte=date_expire).values_list('user_id', flat=True)
+        expired_users = UserDeleteData.objects.filter(deleted_date__lte=current_time).values_list('user_id', flat=True)
 
         User.objects.get(id__in=expired_users).delete()
 
